@@ -17,10 +17,7 @@ namespace NotikaEmail_Identity.Controllers
         public async Task<IActionResult> SignUp(RegisterUserViewModel model)
         {
 
-            if(!ModelState.IsValid)
-            {
-                return View(model);
-            }
+            
 
             if(model.Password != model.ConfirmPassword)
             {

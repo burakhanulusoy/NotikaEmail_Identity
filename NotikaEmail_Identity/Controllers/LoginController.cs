@@ -2,16 +2,18 @@
 using Microsoft.AspNetCore.Mvc;
 using NotikaEmail_Identity.Entities;
 using NotikaEmail_Identity.Models;
-using System.Threading.Tasks;
 
 namespace NotikaEmail_Identity.Controllers
 {
     public class LoginController(SignInManager<AppUser> _signInManager,UserManager<AppUser> _userManager) : Controller
     {
+
+
         public IActionResult SignIn()
-        {
+        { 
             return View();
         }
+
 
         [HttpPost]
         public async Task<IActionResult> SignIn(LoginUserViewModel model)
@@ -40,6 +42,9 @@ namespace NotikaEmail_Identity.Controllers
 
 
         }
+
+
+
 
 
 
