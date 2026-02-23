@@ -1,0 +1,190 @@
+﻿@model RegisterUserViewModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Notika - Kayıt Ol</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"></script>
+
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec37",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#102213",
+                        "forest": "#0a3f1f",
+                        "forest-hover": "#0d5228",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: #a8a8a8;
+            }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased font-display h-screen overflow-hidden flex flex-col">
+    <div class="flex flex-1 h-full w-full overflow-hidden">
+        <div class="hidden lg:flex w-[45%] relative bg-background-dark overflow-hidden flex-col justify-between p-12">
+            <div class="absolute inset-0 bg-cover bg-center opacity-80 mix-blend-overlay" data-alt="Soyut akışkan yeşil ve siyah dalgalar dijital sanat" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD_ydmP4WlNGNp-CaZx8SNtXtMkDt4Ut3v2wLwOtXMArQqBnTG28UNSr6gA1hkNGi8F8w9tpf0lEGSf1O-HW0ASnkxYZMEEuSJNFXXfSczve-Rk0Lhkkqjj2xRrZdQw5HNIvyzVOoq8o-64FwsLXtTc8rUdaPdk5WmcH5jjDEu8AjhbC7d9y0OpF0g2p5w850m5MZI3Vbtp2lckJM5uZBFbUYNwCh7VHaZfGEMo545nPgrQNgIsGrmIZTnqXF90lrC7AtjIquPWXXI4');">
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-br from-background-dark/90 via-background-dark/40 to-primary/20"></div>
+            <div class="relative z-10">
+                <div class="flex items-center gap-2 mb-8">
+                    <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-background-dark font-bold text-xl">N</div>
+                    <span class="text-white text-xl font-bold tracking-tight">Notika</span>
+                </div>
+            </div>
+            <div class="relative z-10 max-w-md">
+                <blockquote class="text-2xl font-medium text-white leading-relaxed">
+                    "Notika, ekibimizin iç iletişimini tamamen dönüştürdü. Hızlı, güvenli ve son derece sezgisel."
+                </blockquote>
+                <div class="mt-6 flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-full bg-cover bg-center border-2 border-primary" data-alt="Takım elbiseli gülümseyen adam portresi" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAVazUVOHD4M-c3358gOay-u8YiiVez-WIsxuKJU1KedC-8WF9dGuKVclJoD4fn-4brekEUXSEh6cuLyq_DNmVijFWWKlTl2SzeoJN1D8Fn5ACzO-v70FurAoor2AoBZGyqEeA3CWkNvmuF1HUknXtufOCmqkIWt7CchEX0PWBMECJN4jS7KjLi0BLPhH6BNTC3QEq5InsqSxSgCuo2TK1OouptG2ZYBUBoLTX8b6l4iB0pTKbVGhRSjR4kXKIJ_h1BKTSqsJ6zt_uG');"></div>
+                    <div>
+                        <p class="text-white font-semibold text-sm">Burak Han Ulusoy</p>
+                        <p class="text-primary text-xs">Öğrenci, M&Y Academy</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="flex-1 flex flex-col h-full bg-white dark:bg-slate-900 relative overflow-y-auto">
+            <div class="lg:hidden p-6 flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-background-dark font-bold text-xl">N</div>
+                <span class="text-slate-900 dark:text-white text-xl font-bold tracking-tight">Notika</span>
+            </div>
+            <div class="flex-1 flex items-center justify-center p-6 md:p-12 lg:p-24">
+                <div class="w-full max-w-[520px] space-y-8">
+                    <div class="space-y-2">
+                        <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-slate-900 dark:text-white">Hesabınızı oluşturun</h1>
+                        <p class="text-slate-500 dark:text-slate-400 text-base">Notika ile e-postalarınızı profesyonelce yönetmeye başlayın.</p>
+                    </div>
+                    <form method="post" class="space-y-5">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div class="space-y-2">
+                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300" asp-for="Name">Ad</label>
+                                <div class="relative">
+                                    <input asp-for="Name" class="w-full h-12 px-4 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200" placeholder="Ahmet" required="" type="text" />
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300" asp-for="Surname">Soyad</label>
+                                <div class="relative">
+                                    <input asp-for="Surname" class="w-full h-12 px-4 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200" placeholder="Yılmaz" required="" type="text" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300" asp-for="UserName">Kullanıcı Adı</label>
+                            <div class="relative">
+                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 material-symbols-outlined text-[20px]">alternate_email</span>
+                                <input asp-for="UserName" class="w-full h-12 pl-11 pr-4 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200" placeholder="ahmetyilmaz" required="" type="text" />
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300" asp-for="Email">E-posta Adresi</label>
+                            <div class="relative">
+                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 material-symbols-outlined text-[20px]">mail</span>
+                                <input asp-for="Email" class="w-full h-12 pl-11 pr-4 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200" placeholder="ahmet@sirket.com" required="" type="email" />
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300" asp-for="Password">Şifre</label>
+                            <div class="relative">
+                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 material-symbols-outlined text-[20px]">lock</span>
+                                <input asp-for="Password" class="w-full h-12 pl-11 pr-4 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200" placeholder="••••••••" required="" type="password" />
+                            </div>
+                            <div class="flex gap-1 pt-1 h-1">
+                                <div class="flex-1 bg-green-500 rounded-full"></div>
+                                <div class="flex-1 bg-green-500 rounded-full"></div>
+                                <div class="flex-1 bg-green-500 rounded-full"></div>
+                                <div class="flex-1 bg-slate-200 dark:bg-slate-700 rounded-full"></div>
+                            </div>
+
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300" asp-for="ConfirmPassword">Şifre (Tekrar)</label>
+                            <div class="relative">
+                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 material-symbols-outlined text-[20px]">lock_reset</span>
+                                <input asp-for="ConfirmPassword" class="w-full h-12 pl-11 pr-4 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200" placeholder="••••••••" required="" type="password" />
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3 pt-2">
+                            <div class="flex h-6 items-center">
+                                <input class="h-5 w-5 rounded border-slate-300 text-primary focus:ring-primary dark:border-slate-600 dark:bg-slate-700" id="terms" name="terms" required="" type="checkbox" />
+                            </div>
+                            <div class="text-sm leading-6">
+                                <label class="font-medium text-slate-700 dark:text-slate-300" for="terms"><a class="font-semibold text-forest hover:text-primary dark:text-primary dark:hover:text-green-400 underline decoration-2 decoration-transparent hover:decoration-current transition-all" href="#">Hizmet Şartları</a>'nı ve <a class="font-semibold text-forest hover:text-primary dark:text-primary dark:hover:text-green-400 underline decoration-2 decoration-transparent hover:decoration-current transition-all" href="#">Gizlilik Politikası</a>'nı okudum, kabul ediyorum.</label>
+                                <span>@Html.ValidationSummary()</span>
+                            </div>
+                        </div>
+                        <button class="w-full h-12 rounded-lg bg-forest hover:bg-forest-hover text-white font-semibold text-base shadow-lg shadow-forest/20 hover:shadow-forest/40 transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 mt-4">
+                            Hesap Oluştur
+                            <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                        </button>
+                    </form>
+                    <div class="relative">
+                        <div aria-hidden="true" class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-slate-200 dark:border-slate-700"></div>
+                        </div>
+                        <div class="relative flex justify-center">
+                            <span class="bg-white dark:bg-slate-900 px-3 text-sm text-slate-500 dark:text-slate-400">Veya şununla devam et</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button class="flex items-center justify-center gap-3 w-full h-12 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 font-medium text-sm">
+                            <img alt="Google Logosu" class="w-5 h-5" src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" />
+                            Google
+                        </button>
+                        <button class="flex items-center justify-center gap-3 w-full h-12 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 font-medium text-sm">
+                            <img alt="GitHub Logosu" class="w-5 h-5 dark:invert" src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" />
+                            GitHub
+                        </button>
+                    </div>
+                    <p class="text-center text-sm text-slate-500 dark:text-slate-400">
+                        Zaten bir hesabın var mı?
+                        <a class="font-semibold text-forest hover:text-primary dark:text-primary dark:hover:text-green-400 transition-colors" href="#">Giriş yap</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
