@@ -1,0 +1,158 @@
+﻿@model LoginUserViewModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Notika - Giriş Yap</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec5b",
+                        "primary-dark": "#0ca53f",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#102216",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1a3322",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .dark ::-webkit-scrollbar-thumb {
+            background-color: #334155;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display antialiased text-slate-900 dark:text-slate-100 h-screen overflow-hidden">
+    <div class="flex min-h-screen w-full flex-row">
+        <div class="hidden lg:flex lg:w-1/2 relative bg-surface-dark items-center justify-center overflow-hidden">
+            <div class="absolute inset-0 z-0">
+                <div class="w-full h-full bg-cover bg-center opacity-80 mix-blend-overlay" data-alt="Soyut rahatlatıcı yeşil doğa yaprakları deseni" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCiVfuhr8TAyZTT_zMSa9mSxrM6G2mD9VBP7OBsH8fYNrBdC_HnrofNBZOeRBdtVJxAaACHfHFEdw8izbdLEgz_2k1W3HOgOtE_VDIn_Eet2GZjEFCdWKyFb-6tZg9LZpCuPRHnnJy5Xt3WKRfn8ctXZH8KxVxCusW-1UYjlVaFI0CdML1dje4DBX_bPrRCa3wbGYfBVVyxVZm31w4Ws29UX1HD5D2DAO80fqdMEoA1njKqzQw08Ke7-fEOr_x49Fprd37KmjSRCrXY");'></div>
+                <div class="absolute inset-0 bg-gradient-to-br from-[#102216]/80 to-[#13ec5b]/20"></div>
+            </div>
+            <div class="relative z-10 p-12 text-white max-w-lg">
+                <h2 class="text-4xl font-bold mb-6 tracking-tight leading-tight">İş akışınızı doğal yollarla güçlendirin.</h2>
+                <p class="text-lg text-slate-200 font-light leading-relaxed">Üretkenlik ve dinginliğin kusursuz uyumunu deneyimleyin. Notika ile dengesini bulan binlerce kullanıcıya katılın.</p>
+                <div class="mt-12 flex gap-4">
+                    <div class="h-2 w-12 bg-primary rounded-full"></div>
+                    <div class="h-2 w-2 bg-white/30 rounded-full"></div>
+                    <div class="h-2 w-2 bg-white/30 rounded-full"></div>
+                </div>
+            </div>
+        </div>
+        <div class="flex flex-1 flex-col items-center justify-center px-4 py-12 sm:px-6 lg:px-20 xl:px-24 bg-surface-light dark:bg-background-dark transition-colors duration-200">
+            <div class="w-full max-w-md space-y-10">
+                <div class="flex flex-col items-center">
+                    <div class="h-12 w-12 rounded-xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center mb-6 shadow-lg shadow-primary/20">
+                        <span class="material-symbols-outlined text-white" style="font-size: 28px;">eco</span>
+                    </div>
+                    <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Notika</h1>
+                    <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Tekrar hoş geldiniz! Lütfen hesabınıza giriş yapın.</p>
+                </div>
+                <form class="space-y-6" method="POST">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium leading-6 text-slate-900 dark:text-slate-200" for="email">
+                            E-posta Adresi
+                        </label>
+                        <div class="relative rounded-lg shadow-sm">
+                            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                <span class="material-symbols-outlined text-slate-400" style="font-size: 20px;">mail</span>
+                            </div>
+                            <input asp-for="Email" class="block w-full rounded-lg border-0 py-3.5 pl-10 text-slate-900 ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-surface-dark dark:ring-slate-700 dark:text-white sm:text-sm sm:leading-6 transition-all duration-200" id="email" placeholder="isim@sirket.com" required="" type="email" />
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <label class="block text-sm font-medium leading-6 text-slate-900 dark:text-slate-200" for="password">
+                                Şifre
+                            </label>
+                            <div class="text-sm">
+                                <a class="font-medium text-primary hover:text-primary-dark dark:hover:text-primary/80 transition-colors" href="/ForgotPassword/Index">Şifremi unuttum</a>
+                            </div>
+                        </div>
+                        <div class="relative rounded-lg shadow-sm group">
+                            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                <span class="material-symbols-outlined text-slate-400" style="font-size: 20px;">lock</span>
+                            </div>
+                            <input asp-for="Password" autocomplete="current-password" class="block w-full rounded-lg border-0 py-3.5 pl-10 pr-10 text-slate-900 ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-surface-dark dark:ring-slate-700 dark:text-white sm:text-sm sm:leading-6 transition-all duration-200" id="password" placeholder="••••••••" required="" type="password" />
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+                                <span class="material-symbols-outlined" style="font-size: 20px;">visibility_off</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <input asp-for="RememberMe" class="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary bg-transparent" id="remember-me" type="checkbox" />
+                        <label class="ml-2 block text-sm text-slate-600 dark:text-slate-400" for="remember-me">Beni 30 gün boyunca hatırla</label>
+                        <br />
+                        <br />
+                        <span class="text-sm text-red-500 font-medium block mt-2">@Html.ValidationSummary()</span>
+                    </div>
+                    <div>
+                        <button class="flex w-full justify-center rounded-lg bg-primary dark:bg-primary px-3 py-3.5 text-sm font-semibold leading-6 text-slate-900 hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary shadow-lg shadow-primary/20 transition-all duration-200">
+                            Giriş Yap
+                        </button>
+                    </div>
+                    <div class="relative mt-8">
+                        <div aria-hidden="true" class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-slate-200 dark:border-slate-700"></div>
+                        </div>
+                        <div class="relative flex justify-center text-sm font-medium leading-6">
+                            <span class="bg-surface-light dark:bg-background-dark px-4 text-slate-500 dark:text-slate-400">Veya şununla devam et</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mt-6">
+                        <a class="flex w-full items-center justify-center gap-3 rounded-lg bg-white dark:bg-surface-dark px-3 py-2.5 text-sm font-semibold text-slate-900 dark:text-slate-200 shadow-sm ring-1 ring-inset ring-slate-300 dark:ring-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors focus-visible:ring-transparent" href="#">
+                            <svg aria-hidden="true" class="h-5 w-5" viewbox="0 0 24 24">
+                                <path d="M12.0003 20.45c-4.6667 0-8.4503-3.7836-8.4503-8.4503C3.55 7.333 7.3336 3.55 12.0003 3.55c2.115 0 4.0536.726 5.5869 1.9363l-2.0986 2.0987c-1.002-.67-2.2137-1.07-3.4883-1.07-3.3134 0-6 2.6866-6 6 0 3.3134 2.6866 6 6 6 2.7683 0 5.0933-1.8584 5.8117-4.4084h-5.8117v-3h8.805c.105.5184.1584 1.0567.1584 1.6134 0 5.0683-3.6667 8.73-8.5634 8.73z" fill="currentColor"></path>
+                            </svg>
+                            <span class="text-sm font-medium">Google</span>
+                        </a>
+                        <a class="flex w-full items-center justify-center gap-3 rounded-lg bg-white dark:bg-surface-dark px-3 py-2.5 text-sm font-semibold text-slate-900 dark:text-slate-200 shadow-sm ring-1 ring-inset ring-slate-300 dark:ring-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors focus-visible:ring-transparent" href="#">
+                            <svg aria-hidden="true" class="h-5 w-5" fill="currentColor" viewbox="0 0 24 24">
+                                <path d="M13.6823 10.6218H10.6035V8.8787C10.6035 8.12563 10.7981 7.72911 11.8596 7.72911H13.6823V5.01161C13.6823 5.01161 12.0156 5 10.4223 5C7.10061 5 4.96561 7.02542 4.96561 10.6441V10.6218H2V13.6393H4.96561V22H8.34976V13.6393H10.6035L11.5369 10.6218H13.6823Z"></path>
+                            </svg>
+                            <span class="text-sm font-medium">Facebook</span>
+                        </a>
+                    </div>
+                    <p class="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
+                        Henüz bir hesabınız yok mu?
+                        <a class="font-semibold leading-6 text-primary hover:text-primary-dark transition-colors" href="/Register/SignUp">Ücretsiz kayıt olun</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

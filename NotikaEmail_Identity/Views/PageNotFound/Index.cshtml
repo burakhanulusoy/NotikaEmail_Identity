@@ -1,0 +1,190 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Notika - 404 Sayfa Bulunamadı</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#25f47b",
+                        "background-light": "#f8fcfa",
+                        "background-dark": "#102217",
+                        "slate": {
+                            900: "#0d1c13", // Custom deep green-black for text
+                            100: "#e7f4ec", // Custom light green-white for text
+                            500: "#499c6c", // Custom medium green for muted text
+                        }
+                    },
+                    fontFamily: {
+                        "display": ["Spline Sans", "Noto Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "2xl": "2rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        @@keyframes float {
+            0%
+
+        {
+            transform: translateY(0px) rotate(0deg);
+        }
+
+        50% {
+            transform: translateY(-20px) rotate(5deg);
+        }
+
+        100% {
+            transform: translateY(0px) rotate(0deg);
+        }
+
+        }
+        @@keyframes pulse-soft {
+            0%
+
+        {
+            opacity: 0.3;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 0.5;
+            transform: scale(1.05);
+        }
+
+        100% {
+            opacity: 0.3;
+            transform: scale(1);
+        }
+
+        }
+
+        .animate-float-slow {
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .animate-float-medium {
+            animation: float 6s ease-in-out infinite reverse;
+        }
+
+        .animate-pulse-soft {
+            animation: pulse-soft 4s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display antialiased overflow-x-hidden">
+    <div class="relative min-h-screen flex flex-col">
+        <div class="absolute inset-0 overflow-hidden pointer-events-none z-0">
+            <div class="absolute -top-20 -right-20 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse-soft"></div>
+            <div class="absolute top-1/3 -left-20 w-72 h-72 bg-[#499c6c]/10 rounded-full blur-3xl animate-float-slow"></div>
+            <div class="absolute bottom-0 right-10 w-80 h-80 bg-primary/5 rounded-full blur-2xl animate-float-medium"></div>
+            <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-soft-light"></div>
+        </div>
+        <main class="relative z-10 flex flex-1 flex-col items-center justify-center px-4 py-12 lg:px-40">
+            <div class="w-full max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-12 lg:gap-24">
+                <div class="w-full md:w-1/2 flex justify-center order-first md:order-last">
+                    <div class="relative w-full max-w-[500px] aspect-square">
+                        <div class="absolute inset-4 bg-gradient-to-tr from-primary/20 to-transparent rounded-full animate-pulse-soft blur-xl"></div>
+                        <div class="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl shadow-primary/20 bg-background-light dark:bg-background-dark border border-primary/10">
+                            <img alt="Abstract green geometric waves representing digital flow" class="w-full h-full object-cover mix-blend-overlay opacity-50" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDr5q3jD-Bwls6BBm2xL6c3aeN9nQs2D_Z8jP38H6ywBuNt5hFpTzABsgPR_fa0MqyaGxMxr6wS5VwyHVAsrdNbE9YB30ZqSQ_6BTWgDaeHhFW8zGRP920HW1CAcmY6xfXzs8ZRwVorhLsIDOvVP2F-nv6VdrdwlAPWOKZXsUf2oLvbtsEsLj7u81f2qavj6NDqcr8wWDMhgWnpgJi9oAzyvmkuwhV6jOpWJjGYOm-DpIDlD6iAWtdW_OheerU2ydv1z5g1wa5jWECP" />
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="relative animate-float-slow">
+                                    <div class="absolute -inset-4 bg-primary/30 rounded-full blur-lg"></div>
+                                    <span class="material-symbols-outlined text-[180px] text-slate-900 dark:text-white drop-shadow-lg relative z-10">
+                                        explore_off
+                                    </span>
+                                    <div class="absolute top-0 right-0 animate-bounce">
+                                        <span class="material-symbols-outlined text-6xl text-primary drop-shadow-md">
+                                            question_mark
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-full md:w-1/2 flex flex-col items-center md:items-start text-center md:text-left gap-6">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs font-bold uppercase tracking-wider">
+                        <span class="material-symbols-outlined text-sm">error</span>
+                        404 Hatası
+                    </div>
+                    <h1 class="text-slate-900 dark:text-slate-100 text-7xl md:text-9xl font-bold leading-none tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-slate-900 to-slate-500 dark:from-white dark:to-slate-400">
+                        404
+                    </h1>
+                    <div class="space-y-4">
+                        <h2 class="text-slate-900 dark:text-slate-100 text-2xl md:text-4xl font-bold leading-tight">
+                            Hata! Aradığınız sayfa bulunamadı.
+                        </h2>
+                        <p class="text-slate-500 dark:text-slate-400 text-lg font-normal leading-relaxed max-w-[480px]">
+                            Görünüşe göre bu sayfa taşınmış veya artık mevcut değil. Endişelenmeyin, pusulamız sizi doğru yola sokabilir.
+                        </p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mt-4">
+                        <button class="flex items-center justify-center gap-2 cursor-pointer overflow-hidden rounded-xl h-14 px-8 bg-primary hover:bg-[#1ee06e] text-slate-900 text-base font-bold shadow-lg shadow-primary/25 transition-all transform hover:-translate-y-1">
+                            <span class="material-symbols-outlined">home</span>
+                            <span>Ana Sayfaya Dön</span>
+                        </button>
+                        <button class="flex items-center justify-center gap-2 cursor-pointer overflow-hidden rounded-xl h-14 px-8 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-primary dark:hover:border-primary text-slate-900 dark:text-slate-100 text-base font-bold transition-all hover:bg-slate-50 dark:hover:bg-slate-700">
+                            <span class="material-symbols-outlined">search</span>
+                            <span>Sitede Ara</span>
+                        </button>
+                    </div>
+                    <div class="pt-8 border-t border-slate-200 dark:border-slate-800 w-full mt-4">
+                        <p class="text-slate-400 dark:text-slate-500 text-sm">
+                            Hızlı Linkler:
+                        </p>
+                        <div class="flex flex-wrap gap-4 mt-2">
+                            <a class="text-primary hover:underline text-sm font-medium" href="#">Yardım Merkezi</a>
+                            <span class="text-slate-300 dark:text-slate-700">•</span>
+                            <a class="text-primary hover:underline text-sm font-medium" href="#">Bize Ulaşın</a>
+                            <span class="text-slate-300 dark:text-slate-700">•</span>
+                            <a class="text-primary hover:underline text-sm font-medium" href="#">Blog</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer class="relative z-20 mt-auto border-t border-slate-200/50 dark:border-slate-800/50 bg-background-light/50 dark:bg-background-dark/50">
+            <div class="layout-container flex flex-col items-center justify-center gap-6 px-5 py-8 text-center md:flex-row md:justify-between lg:px-40 opacity-70 hover:opacity-100 transition-opacity duration-300">
+                <p class="text-slate-500 dark:text-slate-400 text-sm font-normal">© 2024 Notika. Tüm hakları saklıdır.</p>
+                <div class="flex gap-6">
+                    <a class="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors" href="#">
+                        <span class="sr-only">Twitter</span>
+                        <svg class="h-5 w-5 fill-current" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"><path d="M247.39,68.94A8,8,0,0,0,240,64H209.57A48.66,48.66,0,0,0,168.1,40a46.91,46.91,0,0,0-33.75,13.7A47.9,47.9,0,0,0,120,88v6.09C79.74,83.47,46.81,50.72,46.46,50.37a8,8,0,0,0-13.65,4.92c-4.31,47.79,9.57,79.77,22,98.18a110.93,110.93,0,0,0,21.88,24.2c-15.23,17.53-39.21,26.74-39.47,26.84a8,8,0,0,0-3.85,11.93c.75,1.12,3.75,5.05,11.08,8.72C53.51,229.7,65.48,232,80,232c70.67,0,129.72-54.42,135.75-124.44l29.91-29.9A8,8,0,0,0,247.39,68.94Zm-45,29.41a8,8,0,0,0-2.32,5.14C196,166.58,143.28,216,80,216c-10.56,0-18-1.4-23.22-3.08,11.51-6.25,27.56-17,37.88-32.48A8,8,0,0,0,92,169.08c-.47-.27-43.91-26.34-44-96,16,13,45.25,33.17,78.67,38.79A8,8,0,0,0,136,104V88a32,32,0,0,1,9.6-22.92A30.94,30.94,0,0,1,167.9,56c12.66.16,24.49,7.88,29.44,19.21A8,8,0,0,0,204.67,80h16Z"></path></svg>
+                    </a>
+                    <a class="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors" href="#">
+                        <span class="sr-only">Instagram</span>
+                        <svg class="h-5 w-5 fill-current" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"><path d="M128,80a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160ZM176,24H80A56.06,56.06,0,0,0,24,80v96a56.06,56.06,0,0,0,56,56h96a56.06,56.06,0,0,0,56-56V80A56.06,56.06,0,0,0,176,24Zm40,152a40,40,0,0,1-40,40H80a40,40,0,0,1-40-40V80A40,40,0,0,1,80,40h96a40,40,0,0,1,40,40ZM192,76a12,12,0,1,1-12-12A12,12,0,0,1,192,76Z"></path></svg>
+                    </a>
+                    <a class="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors" href="#">
+                        <span class="sr-only">LinkedIn</span>
+                        <svg class="h-5 w-5 fill-current" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"><path d="M216,24H40A16,16,0,0,0,24,40V216a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V40A16,16,0,0,0,216,24Zm0,192H40V40H216V216ZM96,112v64a8,8,0,0,1-16,0V112a8,8,0,0,1,16,0Zm88,28v36a8,8,0,0,1-16,0V140a20,20,0,0,0-40,0v36a8,8,0,0,1-16,0V112a8,8,0,0,1,15.79-1.78A36,36,0,0,1,184,140ZM100,84A12,12,0,1,1,88,72,12,12,0,0,1,100,84Z"></path></svg>
+                    </a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+</body>
+</html>
