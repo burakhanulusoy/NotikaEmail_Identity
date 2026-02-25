@@ -1,8 +1,6 @@
 ﻿@model List<ResultMessageDto>
-
-
 @{
-    ViewData["Title"] = "Inbox";
+    ViewData["Title"] = "SendBox";
     Layout = "~/Views/WebUI/Index.cshtml";
 }
 
@@ -13,7 +11,7 @@
     <div class="container">
         <div class="row">
 
-           
+
             @await Component.InvokeAsync("_MessageMenuSidebarComponentPartial")
 
             <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
@@ -38,56 +36,57 @@
                             <button class="btn btn-default btn-sm"><i class="notika-icon notika-right-arrow"></i></button>
                         </div>
                     </div>
-                    <div class="table-responsive">
-                        <table class="table table-hover table-inbox">
+                    <div class="table-responsive" style="border: none;">
+                        <table class="table table-hover table-inbox" style="width: 100%; table-layout: fixed; border-collapse: collapse;">
                             <tbody>
 
                                 @foreach (var message in Model)
                                 {
-                                    <tr onclick="window.location.href='/Default/ViewEmail/@message.Id';" class="@(message.IsRead ? "" : "unread active")" style="cursor: pointer; border-bottom: 1px solid #f1f1f1; transition: background-color 0.2s ease;">
+                                    <tr onclick="window.location.href='/Default/ReceiverViewEmail/@message.Id';" class="@(message.IsRead ? "" : "unread active")" style="cursor: pointer; border-bottom: 1px solid #f1f1f1;">
 
-                                        <td style="width: 40px; vertical-align: middle; padding: 15px 10px;">
+                                        <td style="width: 40px; vertical-align: middle;">
                                             <label style="margin: 0;"><input type="checkbox" class="i-checks"></label>
                                         </td>
 
-                                        <td style="width: 25%; min-width: 220px; vertical-align: middle; padding: 15px 10px;">
-                                            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                                                <span style="font-weight: @(message.IsRead ? "400" : "600"); color: #333; font-size: 14px; white-space: nowrap;">
-                                                    Kimden: @message.Sender.Name @message.Sender.Surname
-                                                </span>
-                                                <span class="label label-primary" style="font-size: 11px; padding: 4px 8px; border-radius: 4px; white-space: nowrap;">
-                                                    @message.Category.Name
-                                                </span>
-                                            </div>
+                                        <td style="width: 25%; min-width: 200px; vertical-align: middle; padding: 12px 8px;">
+                                            <span style="font-weight: @(message.IsRead ? "normal" : "600"); color: #333; font-size: 14px; white-space: nowrap;">
+                                                Kime: @message.Receiver.Name @message.Receiver.Surname
+                                            </span>
+                                            <br>
+                                            <span class="label label-primary" style="font-size: 11px; padding: 4px 8px; margin-top: 6px; display: inline-block; border-radius: 3px;">
+                                                @message.Category.Name
+                                            </span>
                                         </td>
 
-                                        <td style="vertical-align: middle; padding: 15px 10px; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                                            <span style="font-weight: @(message.IsRead ? "400" : "600"); color: #333; font-size: 14px;">
+                                        <td style="vertical-align: middle; padding: 12px 8px;">
+                                            <span style="font-weight: @(message.IsRead ? "normal" : "600"); color: #333; font-size: 14px;">
                                                 @message.Subject
                                             </span>
-                                            <span style="color: #888; font-size: 13px; margin-left: 6px;">
-                                                &nbsp; - &nbsp; @(message.MessageDetail.Length < 40 ? message.MessageDetail : message.MessageDetail.Substring(0, 40) + "...")
+                                            <span style="color: #888; font-size: 13px;">
+                                                &nbsp; - &nbsp; @(message.MessageDetail.Length < 45 ? message.MessageDetail : message.MessageDetail.Substring(0, 45) + "...")
                                             </span>
                                         </td>
 
-                                        <td style="width: 40px; text-align: center; vertical-align: middle; padding: 15px 10px;">
+                                        <td style="width: 40px; text-align: center; vertical-align: middle;">
                                             @if (!message.IsRead)
                                             {
                                                 <i class="notika-icon notika-paperclip" style="color: #999; font-size: 16px;"></i>
                                             }
                                         </td>
 
-                                        <td class="text-right mail-date" style="width: 150px; vertical-align: middle; padding: 15px 10px; white-space: nowrap;">
-                                            <span style="font-weight: @(message.IsRead ? "400" : "600"); color: #555; font-size: 13px;">
-                                                @message.SendDate.ToString("dd MMMM dddd", new System.Globalization.CultureInfo("tr-TR"))
+                                        <td class="text-right mail-date" style="width: 140px; vertical-align: middle; white-space: nowrap; padding: 12px 8px;">
+                                            <span style="font-weight: @(message.IsRead ? "normal" : "600"); color: #555; font-size: 13px;">
+                                                @message.SendDate.ToString("dd MMM dddd", new System.Globalization.CultureInfo("tr-TR"))
                                             </span>
                                         </td>
 
                                     </tr>
                                 }
+
                             </tbody>
                         </table>
-                        <div class="pagination-inbox">
+
+                        <div class="pagination-inbox" style="margin-top: 20px; text-align: center;">
                             <ul class="wizard-nav-ac">
                                 <li><a class="btn" href="#"><i class="notika-icon notika-back"></i></a></li>
                                 <li class="active"><a class="btn" href="#">1</a></li>
@@ -102,10 +101,6 @@
         </div>
     </div>
 </div>
-
-
-
-
 
 
 

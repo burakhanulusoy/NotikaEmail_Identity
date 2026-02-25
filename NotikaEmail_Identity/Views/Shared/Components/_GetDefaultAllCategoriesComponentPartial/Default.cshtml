@@ -1,0 +1,19 @@
+﻿
+@model List<ResultCategoryDto>
+
+
+<div class="inbox-status">
+    <ul class="inbox-st-nav">
+        
+        @foreach(var category in Model)
+        {
+           @if(category.Status==true)
+            {
+
+                <li><a href="#"><i class="@category.IconUrl"></i> @category.Name</a></li>
+            }
+
+        }
+
+    </ul>
+</div>

@@ -38,7 +38,7 @@ namespace NotikaEmail_Identity.Controllers
             }
 
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Inbox", "Default");
 
 
         }

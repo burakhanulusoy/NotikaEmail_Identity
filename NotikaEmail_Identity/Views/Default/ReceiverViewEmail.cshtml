@@ -1,0 +1,81 @@
+﻿@model ResultMessageDto
+
+
+@{
+    ViewData["Title"] = "ReceiverViewEmail";
+    Layout = "~/Views/WebUI/Index.cshtml";
+    // Şu anki zaman ile gönderim zamanı arasındaki farkı buluyoruz
+    var fark = DateTime.Now - Model.SendDate;
+    string gecenSure = "";
+
+    // Fark gün, saat veya dakikaysa ona göre mantıklı bir yazı yazdırıyoruz
+    if (fark.TotalDays >= 1)
+    {
+        gecenSure = $"{(int)fark.TotalDays} gün önce";
+    }
+    else if (fark.TotalHours >= 1)
+    {
+        gecenSure = $"{(int)fark.TotalHours} saat önce";
+    }
+    else
+    {
+        gecenSure = $"{(int)fark.TotalMinutes} dakika önce";
+    }
+}
+
+
+
+<div class="inbox-area">
+    <div class="container">
+        <div class="row">
+
+            @await Component.InvokeAsync("_MessageMenuSidebarComponentPartial")
+
+
+            <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
+                <div class="view-mail-list sm-res-mg-t-30">
+                    <div class="view-mail-hd">
+                        <div class="view-mail-hrd">
+                            <h2>Mesaj Detayınız</h2>
+                        </div>
+                        <div class="view-ml-rl">
+                            <p style="color: #777; font-size: 13px;">
+                                <i class="notika-icon notika-clock"></i> @Model.SendDate.ToString("HH:mm") (@gecenSure)
+                            </p>
+                        </div>
+                    </div>
+                    <div class="mail-ads mail-vw-ph">
+                        <p class="first-ph"><b>Konu: </b>@Model.Subject</p>
+                        <p><b>Email:</b> <a href="#">@Model.Sender.Email</a></p>
+                        <p class="last-ph"><b>Date:</b> 15.03.2018</p>
+                    </div>
+                    <div class="view-mail-atn">
+                        <h2>Merhaba @Model.Receiver.Name @Model.Receiver.Surname!</h2>
+                        <p>@Model.MessageDetail</p>
+                        <span class="vw-tr">Teşekkürler ve Saygılar</span>
+                        <span>@Model.Sender.Name @Model.Sender.Name</span>
+                    </div>
+                    <div class="file-download-system">
+                        <div class="dw-st-ic mg-t-20">
+                            <div class="dw-atc-sn">
+                                <span><i class="notika-icon notika-paperclip"></i> 4 attachments <i class="notika-icon notika-arrow-right atc-sign"></i></span>
+                            </div>
+                            <div class="dw-atc-sn">
+                                <a class="btn dw-al-ft" href="#">Pdf Formatında İndirin <i class="notika-icon notika-file"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="vw-ml-action-ls text-right mg-t-20">
+                        <div class="btn-group ib-btn-gp active-hook nk-email-inbox">
+                            <a class="btn btn-default btn-sm waves-effect"><i class="notika-icon notika-next"></i> Cevapla</a>
+                            <a class="btn btn-default btn-sm waves-effect"><i class="notika-icon notika-right-arrow"></i> Çöp Kutusuna Taşı</a>
+                            <a class="btn btn-default btn-sm waves-effect"><i class="notika-icon notika-print"></i> Arşivle</a>
+                            <a class="btn btn-default btn-sm waves-effect"><i class="notika-icon notika-trash"></i> Sil</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

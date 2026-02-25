@@ -2,7 +2,14 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using NotikaEmail_Identity.Context;
 using NotikaEmail_Identity.Entities;
+using NotikaEmail_Identity.Mappings;
+using NotikaEmail_Identity.Repositories.CategoryRepositories;
+using NotikaEmail_Identity.Repositories.GenericRepositories;
+using NotikaEmail_Identity.Repositories.MessageRepositories;
+using NotikaEmail_Identity.Services.CategoryServices;
+using NotikaEmail_Identity.Services.MessageServices;
 using NotikaEmail_Identity.Validations;
+using System.ComponentModel;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,10 +21,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection"));
 
 });
-
-
-
-
 
 //ekleme sebeim dependcy ýnjection idednyiy usermanager , signinmanager .... kullanmak için lazým
 builder.Services.AddIdentity<AppUser, AppRole>(config =>
@@ -35,6 +38,25 @@ builder.Services.AddIdentity<AppUser, AppRole>(config =>
 }).AddEntityFrameworkStores<AppDbContext>()
   .AddErrorDescriber<CustomErrorDescriber>();
 //fromstores idedntiy ile veritabaný iliþki haberleþmesýný saðlýyor...
+
+builder.Services.ConfigureApplicationCookie(opt =>
+{
+    opt.LoginPath = "/Login/SignIn";
+
+});
+
+
+
+builder.Services.AddAutoMapper(typeof(CategoryMappings).Assembly);
+
+
+
+builder.Services.AddScoped<ICategoryRepository,CategoryRepository>();
+builder.Services.AddScoped<ICategoryService,CategoryService>();
+
+
+builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+builder.Services.AddScoped<IMessageService, MessageService>();
 
 
 
@@ -60,6 +82,8 @@ app.UseHttpsRedirection();
 //
 app.UseStatusCodePagesWithReExecute("/PageNotFound/Index", "?code={0}");
 app.UseRouting();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

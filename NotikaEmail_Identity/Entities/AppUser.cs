@@ -9,6 +9,10 @@ namespace NotikaEmail_Identity.Entities
         public string? ImageUrl { get; set; }
         public string? City { get; set; }
 
+        public IList<Message> SentMessages { get; set; }
+        public IList<Message> ReceivedMessages { get; set; }
+
+
 
     }
 }
