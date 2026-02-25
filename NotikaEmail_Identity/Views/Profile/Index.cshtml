@@ -1,0 +1,167 @@
+﻿@model UpdateUserDto
+
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/WebUI/Index.cshtml";
+}
+
+
+<style>
+    .profile-view-container {
+        background: #ffffff;
+        padding: 40px;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        margin-top: 20px;
+    }
+
+    .profile-image-section {
+        text-align: center;
+        border-right: 1px solid #eee;
+    }
+
+    .profile-img-lg {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 4px solid #00c292;
+        padding: 4px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .profile-name {
+        font-size: 24px;
+        color: #333;
+        margin-top: 20px;
+        font-weight: 600;
+    }
+
+    .profile-city {
+        color: #777;
+        font-size: 15px;
+        margin-bottom: 20px;
+    }
+
+    .profile-details-section {
+        padding-left: 40px;
+    }
+
+    .profile-detail-item {
+        margin-bottom: 25px;
+        border-bottom: 1px dashed #eee;
+        padding-bottom: 15px;
+    }
+
+        .profile-detail-item:last-child {
+            border-bottom: none;
+        }
+
+    .detail-label {
+        font-size: 13px;
+        color: #888;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 5px;
+        display: block;
+        font-weight: 600;
+    }
+
+    .detail-value {
+        font-size: 16px;
+        color: #333;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+    }
+
+        .detail-value i {
+            color: #00c292;
+            font-size: 20px;
+            margin-right: 12px;
+            width: 25px;
+            text-align: center;
+        }
+
+    .btn-edit-profile {
+        background-color: #00c292;
+        color: white;
+        border: none;
+        padding: 10px 25px;
+        border-radius: 4px;
+        font-size: 14px;
+        transition: all 0.3s;
+        margin-top: 15px;
+        display: inline-block;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+        .btn-edit-profile:hover {
+            background-color: #009973;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 194, 146, 0.3);
+        }
+
+    /* Mobilde düzgün durması için ufak bir dokunuş */
+    @@media (max-width: 768px) {
+        .profile-image-section {
+            border-right: none;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 30px;
+            margin-bottom: 30px;
+        }
+
+        .profile-details-section {
+            padding-left: 15px;
+        }
+    }
+</style>
+
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="profile-view-container">
+            <div class="row">
+
+                <div class="col-md-4 profile-image-section">
+                    <img src="@(string.IsNullOrEmpty(Model.ImageUrl) ? "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png" : Model.ImageUrl)" alt="Profil Resmi" class="profile-img-lg" />
+
+                    <h3 class="profile-name">@Model.Name @Model.Surname</h3>
+
+                    <p class="profile-city">
+                        <i class="notika-icon notika-map"></i>
+                        @(string.IsNullOrEmpty(Model.City) ? "Şehir Belirtilmemiş" : Model.City)
+                    </p>
+
+                    <a href="#" class="btn-edit-profile">
+                        <i class="notika-icon notika-edit"></i> Profili Düzenle
+                    </a>
+                </div>
+
+                <div class="col-md-8 profile-details-section">
+                    <h4 style="color: #00c292; border-bottom: 2px solid #00c292; padding-bottom: 10px; margin-bottom: 25px; margin-top:0;">
+                        İletişim Bilgileri
+                    </h4>
+
+                    <div class="profile-detail-item">
+                        <span class="detail-label">E-Posta Adresi</span>
+                        <span class="detail-value">
+                            <i class="notika-icon notika-mail"></i>
+                            @(string.IsNullOrEmpty(Model.Email) ? "Belirtilmemiş" : Model.Email)
+                        </span>
+                    </div>
+
+                    <div class="profile-detail-item">
+                        <span class="detail-label">Telefon Numarası</span>
+                        <span class="detail-value">
+                            <i class="notika-icon notika-phone"></i>
+                            @(string.IsNullOrEmpty(Model.PhoneNumber) ? "Belirtilmemiş" : Model.PhoneNumber)
+                        </span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

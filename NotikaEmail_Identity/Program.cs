@@ -1,15 +1,14 @@
-using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using NotikaEmail_Identity.Context;
 using NotikaEmail_Identity.Entities;
 using NotikaEmail_Identity.Mappings;
 using NotikaEmail_Identity.Repositories.CategoryRepositories;
-using NotikaEmail_Identity.Repositories.GenericRepositories;
 using NotikaEmail_Identity.Repositories.MessageRepositories;
+using NotikaEmail_Identity.Repositories.UserRepositories;
 using NotikaEmail_Identity.Services.CategoryServices;
 using NotikaEmail_Identity.Services.MessageServices;
+using NotikaEmail_Identity.Services.UserServices;
 using NotikaEmail_Identity.Validations;
-using System.ComponentModel;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -57,6 +56,10 @@ builder.Services.AddScoped<ICategoryService,CategoryService>();
 
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddScoped<IMessageService, MessageService>();
+
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 
 

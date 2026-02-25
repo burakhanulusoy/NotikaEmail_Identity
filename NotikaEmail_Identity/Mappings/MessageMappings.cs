@@ -12,7 +12,7 @@ namespace NotikaEmail_Identity.Mappings
         {
             CreateMap<Message, ResultMessageDto>().ReverseMap();
             CreateMap<Message, UpdateMessageDto>().ReverseMap();
-            CreateMap<Message, CreateCategoryDto>().ReverseMap();
+            CreateMap<Message, CreateMessageDto>().ReverseMap();
 
 
 

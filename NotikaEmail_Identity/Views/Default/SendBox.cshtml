@@ -47,7 +47,6 @@
                                         <td style="width: 40px; vertical-align: middle;">
                                             <label style="margin: 0;"><input type="checkbox" class="i-checks"></label>
                                         </td>
-
                                         <td style="width: 25%; min-width: 200px; vertical-align: middle; padding: 12px 8px;">
                                             <span style="font-weight: @(message.IsRead ? "normal" : "600"); color: #333; font-size: 14px; white-space: nowrap;">
                                                 Kime: @message.Receiver.Name @message.Receiver.Surname
@@ -57,7 +56,6 @@
                                                 @message.Category.Name
                                             </span>
                                         </td>
-
                                         <td style="vertical-align: middle; padding: 12px 8px;">
                                             <span style="font-weight: @(message.IsRead ? "normal" : "600"); color: #333; font-size: 14px;">
                                                 @message.Subject
@@ -66,23 +64,25 @@
                                                 &nbsp; - &nbsp; @(message.MessageDetail.Length < 45 ? message.MessageDetail : message.MessageDetail.Substring(0, 45) + "...")
                                             </span>
                                         </td>
-
                                         <td style="width: 40px; text-align: center; vertical-align: middle;">
                                             @if (!message.IsRead)
                                             {
                                                 <i class="notika-icon notika-paperclip" style="color: #999; font-size: 16px;"></i>
                                             }
                                         </td>
-
                                         <td class="text-right mail-date" style="width: 140px; vertical-align: middle; white-space: nowrap; padding: 12px 8px;">
                                             <span style="font-weight: @(message.IsRead ? "normal" : "600"); color: #555; font-size: 13px;">
                                                 @message.SendDate.ToString("dd MMM dddd", new System.Globalization.CultureInfo("tr-TR"))
                                             </span>
                                         </td>
-
                                     </tr>
                                 }
 
+                          
+                            
+                            
+                            
+                            
                             </tbody>
                         </table>
 

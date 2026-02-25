@@ -22,6 +22,12 @@ namespace NotikaEmail_Identity.Entities
 
 
 
+        //public bool IsGarbage { get; set; }
+        //public bool IsDeleted { get; set; }
+        //public bool IsArchive { get; set; }
+
+
+
 
     }
 }

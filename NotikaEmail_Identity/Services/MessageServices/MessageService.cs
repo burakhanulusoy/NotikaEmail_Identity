@@ -63,10 +63,10 @@ namespace NotikaEmail_Identity.Services.MessageServices
 
         }
 
-        public async Task<ResultMessageDto> GetByIdWithSenderAsync(int id)
+        public async Task<UpdateMessageDto> GetByIdWithSenderAsync(int id)
         {
             var message = await _messageRepository.GetByIdWithSenderAsync(id);
-            return _mapper.Map<ResultMessageDto>(message);
+            return _mapper.Map<UpdateMessageDto>(message);
         }
 
         public async Task<List<ResultMessageDto>> GetFilterAsync(Expression<Func<Message, bool>> filter)

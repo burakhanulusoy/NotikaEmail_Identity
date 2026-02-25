@@ -1,0 +1,149 @@
+﻿@model SendMessageViewModel
+
+@{
+    ViewData["Title"] = "SendMessage";
+    Layout = "~/Views/WebUI/Index.cshtml";
+}
+
+<style>
+    .email-card {
+        border-radius: 8px;
+        border: 1px solid #eee;
+        background: #fff;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        padding: 20px;
+    }
+
+    .email-card-header {
+        border-bottom: 2px solid #667eea;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+    }
+
+        .email-card-header h2 {
+            margin: 0;
+            color: #333;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+    .form-group label {
+        font-weight: 600;
+        color: #555;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .btn-send {
+        background: #667eea;
+        border: none;
+        color: white;
+        padding: 10px 25px;
+        border-radius: 5px;
+        font-weight: bold;
+        transition: 0.3s;
+    }
+
+        .btn-send:hover {
+            background: #5a6cd6;
+            color: white;
+        }
+    /* Select kutusunun senin temanın stiliyle uyumlu olması için */
+    .custom-select {
+        height: 40px;
+        padding-top: 8px;
+    }
+</style>
+
+<div class="inbox-area">
+    <div class="container">
+        <div class="row">
+
+            @await Component.InvokeAsync("_MessageMenuSidebarComponentPartial")
+
+            <div class="col-lg-9 col-md-9 col-sm-8 col-xs-12">
+                <div class="email-card sm-res-mg-t-30">
+
+                    <div class="email-card-header">
+                        <h2><i class="notika-icon notika-edit"></i> Yeni Mesaj Gönder</h2>
+                    </div>
+
+                    <div class="email-card-body">
+                        <form  method="post">
+
+                            <div class="row">
+                              
+
+                                <div class="col-lg-6 col-md-6 col-sm-12">
+                                    <div class="form-group">
+                                        <label>E-posta Adresi</label>
+                                        <div class="nk-int-st">
+                                            <input type="email" asp-for="ReceiverEmail" class="form-control" name="ReceiverEmail" placeholder="ornek@email.com" required />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 col-sm-12">
+                                    <div class="form-group">
+                                        <label>Kategori</label>
+                                        <div class="nk-int-st">
+                                            <select  asp-for="MessageCategoryId"  asp-items="@ViewBag.categories" class="form-control custom-select"  required>
+                                                <option value="" selected disabled>Kategori Seçiniz...</option>
+                                                
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-md-6 col-sm-12">
+                                    <div class="form-group">
+                                        <label>Konu</label>
+                                        <div class="nk-int-st">
+                                            <input type="text" class="form-control" asp-for="Subject" placeholder="Mesajınızın konusu" required />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label>Mesajınız</label>
+                                        <div class="nk-int-st">
+                                            <textarea class="form-control" asp-for="MessageDetail" rows="6" placeholder="Mesajınızı buraya yazın..." required></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mg-t-15">
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label>Dosya Ekle (İsteğe Bağlı)</label>
+                                        <div class="nk-int-st">
+                                            <input type="file" class="form-control" name="AttachedFile" style="padding-top: 5px;" />
+                                        </div>
+                                    </div>
+
+                                    <span class="text-danger">@Html.ValidationSummary()</span>
+                                </div>
+                            </div>
+
+                            <div class="row mg-t-20">
+                                <div class="col-lg-12 text-right">
+                                    <button  class="btn btn-send waves-effect">
+                                        <i class="notika-icon notika-right-arrow"></i> Mesajı Gönder
+                                    </button>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

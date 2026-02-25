@@ -12,7 +12,7 @@ namespace NotikaEmail_Identity.Services.MessageServices
         Task<List<ResultMessageDto>> GetAllFiterWithSenderAsync(Expression<Func<Message, bool>> filter);
 
         Task<ResultMessageDto> GetByIdWithReceiverAsync(int id);
-        Task<ResultMessageDto> GetByIdWithSenderAsync(int id);
+        Task<UpdateMessageDto> GetByIdWithSenderAsync(int id);
 
     }
 }

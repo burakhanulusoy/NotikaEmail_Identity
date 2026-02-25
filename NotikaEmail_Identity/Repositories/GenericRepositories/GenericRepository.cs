@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 
 namespace NotikaEmail_Identity.Repositories.GenericRepositories
 {
-    public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : BaseEntity
+    public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : class
     {
 
         protected readonly AppDbContext _context;

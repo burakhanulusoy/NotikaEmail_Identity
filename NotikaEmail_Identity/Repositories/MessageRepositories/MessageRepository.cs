@@ -38,6 +38,7 @@ namespace NotikaEmail_Identity.Repositories.MessageRepositories
                                .Include(x => x.Sender)
                                .Include(x => x.Receiver)
                                .Where(filter)
+                               .OrderByDescending(x=>x.Id)
                                .ToListAsync();
 
         }
@@ -45,7 +46,7 @@ namespace NotikaEmail_Identity.Repositories.MessageRepositories
         public async Task<Message> GetByIdWithReceiverAsync(int id)
         {
 
-            var message = await _table.Where(x=>x.Id==id).Include(x=>x.Receiver).Include(x=>x.Sender).AsNoTracking().FirstOrDefaultAsync();
+            var message = await _table.Where(x=>x.Id==id).Include(x=>x.Category).Include(x=>x.Receiver).Include(x=>x.Sender).AsNoTracking().FirstOrDefaultAsync();
             return message;
           
             

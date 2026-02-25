@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 
 namespace NotikaEmail_Identity.Repositories.GenericRepositories
 {
-    public interface IGenericRepository<TEntity> where TEntity : BaseEntity
+    public interface IGenericRepository<TEntity> where TEntity : class
     {
 
         Task<List<TEntity>> GetAllAsync();
