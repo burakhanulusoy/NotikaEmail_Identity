@@ -44,8 +44,9 @@ namespace NotikaEmail_Identity.Services.UserServices
 
         public async Task UpdateAsync(UpdateUserDto dto)
         {
-            var user = _mapper.Map<AppUser>(dto);
-            await _userRepository.UpdateAsync(user);
+            var existingUser = await _userRepository.GetByIdAsync(dto.Id); // Orjinali getir
+            _mapper.Map(dto, existingUser); // Sadece değişenleri üzerine yaz
+            await _userRepository.UpdateAsync(existingUser); // Orjinali geri yolla
 
         }
     }

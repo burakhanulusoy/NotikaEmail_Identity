@@ -12,5 +12,14 @@
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
 
+
+        public string TwitterLink { get; set; }
+        public string GitHubLink { get; set; }
+        public string LinkedlnLink { get; set; }
+        public string AboutMe { get; set; }
+        public string Job { get; set; }
+        public DateTime CreatedDate { get; set; }
+
+
     }
 }
