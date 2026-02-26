@@ -58,5 +58,26 @@ namespace NotikaEmail_Identity.Repositories.MessageRepositories
             var message = await _table.Where(x => x.Id == id).Include(x => x.Sender).Include(x=>x.Receiver).AsNoTracking().FirstOrDefaultAsync();
             return message;
         }
+
+        public async Task<int> GetDontReadMessageCountAsync(int id)
+        {
+             var count= await _table.Where(x=>x.ReceiverId == id && x.IsRead == false).CountAsync();
+            
+             return count;
+
+
+
+        }
+
+        public async Task<List<Message>> GetLast5DontReadMessageAsync(int id)
+        {
+
+            var messages = await _table.Where(x => x.ReceiverId == id && x.IsRead == false)
+                .Include(x=>x.Sender)
+                .OrderByDescending(x=>x.Id).Take(5).ToListAsync();
+
+            return messages;
+
+        }
     }
 }

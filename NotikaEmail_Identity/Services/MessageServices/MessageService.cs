@@ -69,9 +69,22 @@ namespace NotikaEmail_Identity.Services.MessageServices
             return _mapper.Map<UpdateMessageDto>(message);
         }
 
+        public Task<int> GetDontReadMessageCountAsync(int id)
+        {
+            return _messageRepository.GetDontReadMessageCountAsync(id);
+        }
+
         public async Task<List<ResultMessageDto>> GetFilterAsync(Expression<Func<Message, bool>> filter)
         {
             var messages = await _messageRepository.GetAllFiterAsync(filter);
+            return _mapper.Map<List<ResultMessageDto>>(messages);
+
+        }
+
+        public async Task<List<ResultMessageDto>> GetLast5DontReadMessageAsync(int id)
+        {
+
+            var messages = await _messageRepository.GetLast5DontReadMessageAsync(id);
             return _mapper.Map<List<ResultMessageDto>>(messages);
 
         }

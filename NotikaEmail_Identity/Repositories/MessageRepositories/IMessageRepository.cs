@@ -16,5 +16,14 @@ namespace NotikaEmail_Identity.Repositories.MessageRepositories
         Task<Message> GetByIdWithReceiverAsync(int id);
         Task<Message> GetByIdWithSenderAsync(int id);
 
+
+        //Toplam okunmayan mesaj sayısı alanın mesajı receiver
+        Task<int> GetDontReadMessageCountAsync(int id);
+        //okunmyan son 5 mesajı getir
+        Task<List<Message>> GetLast5DontReadMessageAsync(int id);
+
+
+
+
     }
 }
