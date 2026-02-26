@@ -1,3 +1,5 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using NotikaEmail_Identity.Context;
 using NotikaEmail_Identity.Entities;
@@ -48,7 +50,9 @@ builder.Services.ConfigureApplicationCookie(opt =>
 
 builder.Services.AddAutoMapper(typeof(CategoryMappings).Assembly);
 
-
+builder.Services.AddFluentValidationAutoValidation().
+                 AddFluentValidationClientsideAdapters()
+                 .AddValidatorsFromAssembly(typeof(ChangePasswordValidator).Assembly);
 
 builder.Services.AddScoped<ICategoryRepository,CategoryRepository>();
 builder.Services.AddScoped<ICategoryService,CategoryService>();
