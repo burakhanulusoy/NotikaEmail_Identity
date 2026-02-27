@@ -18,6 +18,12 @@
         public string LinkedlnLink { get; set; }
         public string AboutMe { get; set; }
         public string Job { get; set; }
+
+        public int? ActivationCode { get; set; }
+
+
+
+
         public DateTime CreatedDate { get; set; }
 
 

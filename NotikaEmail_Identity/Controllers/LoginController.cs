@@ -40,6 +40,14 @@ namespace NotikaEmail_Identity.Controllers
                 return View(model);
             }
 
+            if (user.EmailConfirmed is false)
+            {
+                ModelState.AddModelError("", "Kayıtlı emailiniz aktifleştirilmemiş lütfen kontrol edin.");
+                return View(model);
+            }
+
+
+
 
             return RedirectToAction("Inbox", "Default");
 

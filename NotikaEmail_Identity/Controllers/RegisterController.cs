@@ -1,11 +1,20 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using MailKit.Net.Smtp;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using MimeKit;
 using NotikaEmail_Identity.Entities;
 using NotikaEmail_Identity.Models;
+using NotikaEmail_Identity.Services.SendEmailServices;
+
+
+
+
+
+
 
 namespace NotikaEmail_Identity.Controllers
 {
-    public class RegisterController(UserManager<AppUser> _userManger) : Controller
+    public class RegisterController(UserManager<AppUser> _userManger ,ISendEmail _sendEmail) : Controller
     {
         public IActionResult SignUp()
         {
@@ -26,6 +35,10 @@ namespace NotikaEmail_Identity.Controllers
             }
 
 
+            Random rnd=new Random();
+            int activationCode = rnd.Next(100000,999999);
+
+
 
 
             //yapma nedenim create user içine appuser türünde istiyor!!!
@@ -34,15 +47,20 @@ namespace NotikaEmail_Identity.Controllers
                 Email = model.Email,
                 UserName = model.UserName,
                 Name = model.Name,
-                Surname = model.Surname
-            };
+                Surname = model.Surname,
+                CreatedDate = DateTime.Now,
+                Job = "Belirtilmemiş",
+                AboutMe="Belirtilmemiş",
+                ActivationCode=activationCode
 
+            };
 
             var result = await _userManger.CreateAsync(user, model.Password);
 
             if(!result.Succeeded)
             {
-                foreach(var item in result.Errors)
+               
+                foreach (var item in result.Errors)
                 {
 
                     ModelState.AddModelError("", item.Description);
@@ -50,8 +68,11 @@ namespace NotikaEmail_Identity.Controllers
                 return View(model);
             }
 
+            _sendEmail.SendEmail(user.Email, activationCode);
 
-            return RedirectToAction("SignIn", "Login");
+            TempData["EmailMove"] = model.Email;
+
+            return RedirectToAction("UserActivation", "Activation");
             
 
 

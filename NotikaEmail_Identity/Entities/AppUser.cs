@@ -16,6 +16,7 @@ namespace NotikaEmail_Identity.Entities
         public string? Job { get; set; }
         public DateTime? CreatedDate { get; set; }
 
+        public int? ActivationCode { get; set; }
 
 
 

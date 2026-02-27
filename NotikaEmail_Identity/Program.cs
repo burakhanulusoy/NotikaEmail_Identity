@@ -9,6 +9,7 @@ using NotikaEmail_Identity.Repositories.MessageRepositories;
 using NotikaEmail_Identity.Repositories.UserRepositories;
 using NotikaEmail_Identity.Services.CategoryServices;
 using NotikaEmail_Identity.Services.MessageServices;
+using NotikaEmail_Identity.Services.SendEmailServices;
 using NotikaEmail_Identity.Services.UserServices;
 using NotikaEmail_Identity.Validations;
 
@@ -65,6 +66,7 @@ builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 
+builder.Services.AddScoped<ISendEmail, SendEmail>();
 
 
 

@@ -13,7 +13,6 @@
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
     <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -36,7 +35,6 @@
         }
     </script>
     <style>
-        /* Custom scrollbar for better aesthetics */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -52,6 +50,17 @@
 
         .dark ::-webkit-scrollbar-thumb {
             background-color: #334155;
+        }
+
+        /* ASP.NET Core Validation listesi için özel düzeltme */
+        .validation-summary-errors ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .validation-summary-errors li {
+            margin-bottom: 4px;
         }
     </style>
 </head>
@@ -72,8 +81,9 @@
                 </div>
             </div>
         </div>
+
         <div class="flex flex-1 flex-col items-center justify-center px-4 py-12 sm:px-6 lg:px-20 xl:px-24 bg-surface-light dark:bg-background-dark transition-colors duration-200">
-            <div class="w-full max-w-md space-y-10">
+            <div class="w-full max-w-md space-y-8">
                 <div class="flex flex-col items-center">
                     <div class="h-12 w-12 rounded-xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center mb-6 shadow-lg shadow-primary/20">
                         <span class="material-symbols-outlined text-white" style="font-size: 28px;">eco</span>
@@ -81,11 +91,33 @@
                     <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Notika</h1>
                     <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Tekrar hoş geldiniz! Lütfen hesabınıza giriş yapın.</p>
                 </div>
+
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="rounded-lg bg-red-50 dark:bg-red-900/30 p-4 border border-red-200 dark:border-red-800 shadow-sm transition-all duration-300">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <span class="material-symbols-outlined text-red-500 dark:text-red-400" style="font-size: 24px;">error</span>
+                            </div>
+                            <div class="ml-3 w-full">
+                                <h3 class="text-sm font-semibold text-red-800 dark:text-red-200">Giriş Başarısız</h3>
+                                <div class="mt-1 text-sm text-red-700 dark:text-red-300 font-medium validation-summary-errors">
+                                    <div asp-validation-summary="All"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
                 <form class="space-y-6" method="POST">
                     <div class="space-y-2">
-                        <label class="block text-sm font-medium leading-6 text-slate-900 dark:text-slate-200" for="email">
-                            E-posta Adresi
-                        </label>
+                        <div class="flex items-center justify-between">
+                            <label class="block text-sm font-medium leading-6 text-slate-900 dark:text-slate-200" for="email">
+                                E-posta Adresi
+                            </label>
+                            <div class="text-sm">
+                                <a class="font-medium text-primary hover:text-primary-dark dark:hover:text-primary/80 transition-colors" href="/Activation/RequestNewCode">E-postayı Aktifleştir</a>
+                            </div>
+                        </div>
                         <div class="relative rounded-lg shadow-sm">
                             <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                                 <span class="material-symbols-outlined text-slate-400" style="font-size: 20px;">mail</span>
@@ -112,18 +144,18 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="flex items-center">
                         <input asp-for="RememberMe" class="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary bg-transparent" id="remember-me" type="checkbox" />
                         <label class="ml-2 block text-sm text-slate-600 dark:text-slate-400" for="remember-me">Beni 30 gün boyunca hatırla</label>
-                        <br />
-                        <br />
-                        <span class="text-sm text-red-500 font-medium block mt-2">@Html.ValidationSummary()</span>
                     </div>
+
                     <div>
                         <button class="flex w-full justify-center rounded-lg bg-primary dark:bg-primary px-3 py-3.5 text-sm font-semibold leading-6 text-slate-900 hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary shadow-lg shadow-primary/20 transition-all duration-200">
                             Giriş Yap
                         </button>
                     </div>
+
                     <div class="relative mt-8">
                         <div aria-hidden="true" class="absolute inset-0 flex items-center">
                             <div class="w-full border-t border-slate-200 dark:border-slate-700"></div>
