@@ -1,7 +1,5 @@
-﻿using MailKit.Net.Smtp;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using MimeKit;
 using NotikaEmail_Identity.Entities;
 using NotikaEmail_Identity.Models;
 using NotikaEmail_Identity.Services.SendEmailServices;

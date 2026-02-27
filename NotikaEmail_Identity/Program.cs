@@ -48,6 +48,20 @@ builder.Services.ConfigureApplicationCookie(opt =>
 });
 
 
+builder.Services.AddAuthentication()
+    .AddGoogle(options =>
+    {
+        options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+
+        options.Events.OnRedirectToAuthorizationEndpoint = context =>
+        {
+            // DEÐÝÞEN KISIM: "login" veya "select_account" yerine "consent" yazdýk.
+            // Bu sayede o aradýðýn "Devam Et" ve onay sayfalarý her seferinde karþýna gelir.
+            context.Response.Redirect(context.RedirectUri + "&prompt=consent");
+            return Task.CompletedTask;
+        };
+    });
 
 builder.Services.AddAutoMapper(typeof(CategoryMappings).Assembly);
 
