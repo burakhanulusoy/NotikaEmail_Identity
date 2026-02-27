@@ -1,31 +1,110 @@
-﻿
-@*
-    message sidebar view component
-*@
+﻿@* message sidebar view component *@
 
+@{
+    // Mevcut sayfanın URL yolunu alıyoruz (Gelen Kutusu mu Giden Kutusu mu anlamak için)
+    var currentUrl = Context.Request.Path.ToString().ToLower();
+}
 
+<style>
+    /* "Yeni Mesaj Oluştur" Butonu Özelleştirmesi */
+    .compose-ml .btn-compose {
+        width: 100%;
+        background-color: #00c292; /* Tema Yeşili */
+        color: white;
+        font-weight: 600;
+        font-size: 15px;
+        padding: 10px; /* Butonu da biraz kibarlaştırdık */
+        border-radius: 4px;
+        transition: all 0.3s ease;
+        border: none;
+    }
 
+        .compose-ml .btn-compose:hover {
+            background-color: #009973;
+            box-shadow: 0 4px 8px rgba(0, 194, 146, 0.3);
+            color: white;
+        }
 
+    /* Sol Menü Linkleri Genel Stili - BOŞLUKLAR İYİCE KISILDI */
+    .inbox-st-nav li a {
+        transition: all 0.2s ease-in-out;
+        font-size: 14px;
+        font-weight: 500 !important; /* Temanın "Gelen Kutusunu" kalın yapma inadını eziyoruz! */
+        color: #555555 !important;
+        display: block;
+        padding: 5px 15px !important; /* İç boşlukları minimuma indirdik */
+        border-radius: 4px;
+        margin-bottom: 0px !important; /* Elemanlar arası boşluğu sıfırladık */
+    }
 
+        /* Üzerine gelince hafif sağa kayma ve renk değişimi efekti */
+        .inbox-st-nav li a:hover {
+            background-color: #f8f9fa;
+            color: #00c292 !important;
+            padding-left: 20px !important;
+        }
 
+    /* İŞTE SENİN İSTEDİĞİN AKTİF MENÜ KISMI */
+    .inbox-st-nav li.active-menu a {
+        font-weight: 700 !important; /* SADECE aktif olan kalın olacak! */
+        color: #00c292 !important;
+        background-color: #f0fdf8;
+        border-left: 4px solid #00c292;
+        padding-left: 15px !important;
+    }
+
+        /* Aktif menünün ikonunu da yeşil yapıyoruz */
+        .inbox-st-nav li.active-menu a i {
+            color: #00c292 !important;
+        }
+
+    /* Gelen Kutusu yanındaki sayı (Badge) stili */
+    .inbox-st-nav .mail-badge {
+        background-color: #00c292;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+        margin-top: 1px;
+    }
+</style>
 
 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
     <div class="inbox-left-sd">
+
         <div class="compose-ml">
-            <a class="btn" href="/Default/SendMessage">Yeni Mesaj Oluştur</a>
+            <a class="btn btn-compose" href="/Default/SendMessage">Yeni Mesaj Oluştur</a>
         </div>
-        <div class="inbox-status">
+
+        <div class="inbox-status" style="margin-top: 10px;">
             <ul class="inbox-st-nav inbox-ft">
-                <li><a href="/Default/Inbox"><i class="notika-icon notika-mail"></i>Gelen Kutusu<span class="pull-right">12</span></a></li>
-                <li><a href="/Default/SendBox"><i class="notika-icon notika-sent"></i> Giden Kutusu</a></li>
+
+                <li class="@(currentUrl.Contains("inbox") || currentUrl == "/default" || currentUrl == "/" ? "active-menu" : "")">
+                    <a href="/Default/Inbox">
+                        <i class="notika-icon notika-mail"></i> Gelen Kutusu
+                        <span class="pull-right mail-badge">@ViewBag.count</span>
+                    </a>
+                </li>
+
+                <li class="@(currentUrl.Contains("sendbox") ? "active-menu" : "")">
+                    <a href="/Default/SendBox">
+                        <i class="notika-icon notika-sent"></i> Giden Kutusu
+                    </a>
+                </li>
+
                 <li><a href="#"><i class="notika-icon notika-draft"></i> Arşivlerim</a></li>
                 <li><a href="#"><i class="notika-icon notika-draft"></i> Taslaklarım</a></li>
                 <li><a href="#"><i class="notika-icon notika-trash"></i> Çöp Kutusu</a></li>
             </ul>
         </div>
-        <hr>
+
+        <hr style="margin: 5px 0;">
+
         @await Component.InvokeAsync("_GetDefaultAllCategoriesComponentPartial")
-        <hr>
+
+        <hr style="margin: 5px 0;">
+
         <div class="inbox-status">
             <ul class="inbox-st-nav inbox-nav-mg">
                 <li><a href="#"><i class="notika-icon notika-success"></i> Forum</a></li>
@@ -35,5 +114,6 @@
                 <li><a href="#"><i class="notika-icon notika-support"></i> Destek</a></li>
             </ul>
         </div>
+
     </div>
 </div>

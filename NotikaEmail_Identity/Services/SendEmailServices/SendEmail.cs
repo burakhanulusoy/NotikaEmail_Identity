@@ -9,7 +9,7 @@ namespace NotikaEmail_Identity.Services.SendEmailServices
         {
             MimeMessage mimeMessage = new MimeMessage();
 
-            MailboxAddress mailboxAddressFrom = new MailboxAddress("Admin", "burakhanulusoy18@gmail.com");//kimden gidecek 
+            MailboxAddress mailboxAddressFrom = new MailboxAddress("NotikaApp", "burakhanulusoy18@gmail.com");//kimden gidecek 
 
             mimeMessage.From.Add(mailboxAddressFrom);
 
