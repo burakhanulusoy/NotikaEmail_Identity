@@ -3,27 +3,12 @@
     ViewData["Title"] = "ViewEmail";
     Layout = "~/Views/WebUI/Index.cshtml";
 
-
     // Şu anki zaman ile gönderim zamanı arasındaki farkı buluyoruz
     var fark = DateTime.Now - Model.SendDate;
-    string gecenSure = "";
-
-    // Fark gün, saat veya dakikaysa ona göre mantıklı bir yazı yazdırıyoruz
-    if (fark.TotalDays >= 1)
-    {
-        gecenSure = $"{(int)fark.TotalDays} gün önce";
-    }
-    else if (fark.TotalHours >= 1)
-    {
-        gecenSure = $"{(int)fark.TotalHours} saat önce";
-    }
-    else
-    {
-        gecenSure = $"{(int)fark.TotalMinutes} dakika önce";
-    }
+    string gecenSure = fark.TotalDays >= 1 ? $"{(int)fark.TotalDays} gün önce" :
+                       fark.TotalHours >= 1 ? $"{(int)fark.TotalHours} saat önce" :
+                       $"{(int)fark.TotalMinutes} dakika önce";
 }
-
-
 
 <div class="inbox-area">
     <div class="container">
@@ -31,54 +16,147 @@
 
             @await Component.InvokeAsync("_MessageMenuSidebarComponentPartial")
 
-
             <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
-                <div class="view-mail-list sm-res-mg-t-30">
-                    <div class="view-mail-hd">
+                <div class="view-mail-list sm-res-mg-t-30" style="padding: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-radius: 4px;">
+
+                    <div class="view-mail-hd" style="border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 15px;">
                         <div class="view-mail-hrd">
-                            <h2>Mesaj Detayınız</h2>
+                            <h2 style="margin: 0; font-size: 20px; color: #333;">Mesaj Detayınız</h2>
                         </div>
                         <div class="view-ml-rl">
-                            <p style="color: #777; font-size: 13px;">
-                                <i class="notika-icon notika-clock"></i> @Model.SendDate.ToString("HH:mm") (@gecenSure)
+                            <p style="margin: 0; color: #999; font-size: 13px;">
+                                <i class="notika-icon notika-clock"></i> (@gecenSure)
                             </p>
                         </div>
                     </div>
-                    <div class="mail-ads mail-vw-ph">
-                        <p class="first-ph"><b>Konu: </b>@Model.Subject</p>
-                        <p class="first-ph"><b>Kategori: </b>@Model.Category.Name</p>
-                        <p class="first-ph"><b>Telefon: </b>@Model.Sender.PhoneNumber</p>
-                        <p class="first-ph"><b>şehir: </b>@Model.Sender.City</p>
-                        <p><b>Email:</b> <a href="#">@Model.Sender.Email</a></p>
-                        <p class="last-ph"><b>Date:</b> 15.03.2018</p>
+
+                    <div class="mail-ads mail-vw-ph" style="background-color: #fbfbfb; padding: 15px 20px; border-left: 4px solid #00c292; border-radius: 4px; margin-bottom: 25px;">
+                        <p style="margin-bottom: 6px; font-size: 15px; color: #333;">
+                            <span style="color: #777; font-weight: 500;">Konu:</span> @Model.Subject
+                        </p>
+                        <p style="margin-bottom: 6px; font-size: 14px;">
+                            <span style="color: #777; font-weight: 500;">Kategori:</span>
+                            <span class="badge" style="background-color: #00c292; padding: 4px 8px; border-radius: 12px; font-weight: normal;">@Model.Category.Name</span>
+                        </p>
+                        <p style="margin-bottom: 6px; font-size: 14px;">
+                            <span style="color: #777; font-weight: 500;">Gönderen:</span>
+                            <a href="mailto:@Model.Sender.Email" style="color: #00c292; text-decoration: none;">@Model.Sender.Email</a>
+                        </p>
+                        <p style="margin-bottom: 0; font-size: 14px;">
+                            <span style="color: #777; font-weight: 500;">Alınma Tarihi:</span> @Model.SendDate.ToString("dd MMMM yyyy, dddd - HH:mm")
+                        </p>
                     </div>
-                    <div class="view-mail-atn">
-                        <h2>Merhaba @Model.Receiver.Name @Model.Receiver.Surname!</h2>
-                        <p>@Model.MessageDetail</p>
-                        <span class="vw-tr">Teşekkürler ve Saygılar</span>
-                        <span>@Model.Sender.Name @Model.Sender.Name</span>
+
+                    <div class="view-mail-atn" style="padding: 10px 5px; color: #444; line-height: 1.6; font-size: 14px;">
+                        <p style="white-space: pre-wrap; margin: 0;">@Model.MessageDetail</p>
                     </div>
-                    <div class="file-download-system">
-                        <div class="dw-st-ic mg-t-20">
+
+                    <div class="file-download-system" style="border-top: 1px solid #eee; margin-top: 35px; padding-top: 20px;">
+                        <div class="dw-st-ic" style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+
                             <div class="dw-atc-sn">
-                                <span><i class="notika-icon notika-paperclip"></i> 4 attachments <i class="notika-icon notika-arrow-right atc-sign"></i></span>
+                                <span style="color: #777; font-weight: 500;"><i class="notika-icon notika-paperclip"></i> İşlemler / Ekler <i class="notika-icon notika-arrow-right atc-sign"></i></span>
                             </div>
+
                             <div class="dw-atc-sn">
-                                <a class="btn dw-al-ft" href="#">Pdf Formatında İndirin <i class="notika-icon notika-file"></i></a>
+                                <a class="btn dw-al-ft" href="javascript:void(0);" onclick="downloadPDF()" style="background-color: #f5f5f5; color: #555; border: 1px solid #ddd; transition: all 0.3s; padding: 8px 15px; border-radius: 4px;">
+                                    Mesajı PDF İndir <i class="notika-icon notika-file"></i>
+                                </a>
                             </div>
+                            @if (!string.IsNullOrEmpty(Model.AttachedFilePath))
+                            {
+                                <div class="dw-atc-sn">
+                                    <a class="btn" href="@Url.Action("DownloadAttachment", "Default", new { filePath = Model.AttachedFilePath })" style="background-color: #00c292; color: white; border: 1px solid #00c292; transition: all 0.3s; padding: 8px 15px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0, 194, 146, 0.3);">
+                                        Ekli Dosyayı İndir <i class="notika-icon notika-down-arrow"></i>
+                                    </a>
+                                </div>
+                            }
+
                         </div>
                     </div>
-                    <div class="vw-ml-action-ls text-right mg-t-20">
+
+                    <div class="vw-ml-action-ls text-right mg-t-20" style="margin-top: 30px;">
                         <div class="btn-group ib-btn-gp active-hook nk-email-inbox">
                             <a class="btn btn-default btn-sm waves-effect"><i class="notika-icon notika-next"></i> Cevapla</a>
-                            <a class="btn btn-default btn-sm waves-effect"><i class="notika-icon notika-right-arrow"></i> Çöp Kutusuna Taşı</a>
+                            <a class="btn btn-default btn-sm waves-effect"><i class="notika-icon notika-right-arrow"></i> Çöpe Taşı</a>
                             <a class="btn btn-default btn-sm waves-effect"><i class="notika-icon notika-print"></i> Arşivle</a>
                             <a class="btn btn-default btn-sm waves-effect"><i class="notika-icon notika-trash"></i> Sil</a>
                         </div>
                     </div>
+
                 </div>
             </div>
 
         </div>
     </div>
 </div>
+
+
+
+
+
+<div id="pdf-document" style="display: none; padding: 40px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333; background-color: white;">
+
+    <div style="text-align: center; border-bottom: 2px solid #00c292; padding-bottom: 20px; margin-bottom: 30px;">
+        <img src="~/notika/img/logo/logo.png" alt="Notika Logo" style="max-height: 50px;" />
+        <h2 style="margin-top: 15px; color: #333; font-size: 22px; font-weight: normal;">Resmi İletişim Belgesi</h2>
+    </div>
+
+    <table style="width: 100%; margin-bottom: 30px; font-size: 14px; text-align: left; border-collapse: collapse;">
+        <tr>
+            <td style="padding: 8px 0; width: 120px; font-weight: bold; color: #555;">Gönderen </td>
+            <td style="padding: 8px 0;">: @Model.Sender.Email</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px 0; font-weight: bold; color: #555;">Alıcı (Siz)</td>
+            <td style="padding: 8px 0;">: @Model.Receiver.Email</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px 0; font-weight: bold; color: #555;">Konu</td>
+            <td style="padding: 8px 0;">: @Model.Subject</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px 0; font-weight: bold; color: #555;">Tarih</td>
+            <td style="padding: 8px 0;">: @Model.SendDate.ToString("dd MMMM yyyy, dddd - HH:mm")</td>
+        </tr>
+    </table>
+
+    <div style="font-weight: bold; margin-bottom: 10px; color: #555;">Mesaj Detayı:</div>
+    <div style="border: 1px solid #eee; padding: 20px; background-color: #fcfcfc; min-height: 250px; font-size: 14px; line-height: 1.6; white-space: pre-wrap;">@Model.MessageDetail</div>
+
+    <div style="margin-top: 50px; text-align: center; border-top: 1px solid #eee; padding-top: 20px;">
+
+        <img src="/images/logo.png" alt="Marka Logosu" style="max-height: 45px; margin-bottom: 10px; opacity: 0.9;" />
+
+        <br />
+        <span style="font-size: 11px; color: #aaa;">
+            Bu belge Notika sistemi üzerinden <b>@DateTime.Now.ToString("dd.MM.yyyy HH:mm")</b> tarihinde otomatik olarak oluşturulmuştur.
+        </span>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<script>
+    function downloadPDF() {
+        // Çıktısı alınacak elementi seç
+        var element = document.getElementById('pdf-document');
+
+        // Render işlemi için elementi geçici olarak görünür yap
+        element.style.display = 'block';
+
+        // PDF Ayarları
+        var opt = {
+            margin:       0.5, // Kenar boşlukları
+            filename:     'Mesaj_@@Model.Subject.Replace(" ", "_").pdf', // Dosya adı örneğin: Mesaj_Siparis_Onayi.pdf
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2 }, // Daha net görüntü için scale 2
+            jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' } // A4 Dikey format
+        };
+
+        // PDF'i oluştur, indir ve sonra elementi tekrar gizle
+        html2pdf().set(opt).from(element).save().then(function () {
+            element.style.display = 'none';
+        });
+    }
+</script>

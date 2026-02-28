@@ -1,12 +1,32 @@
-﻿@model List<ResultMessageDto>
+﻿@using PagedList.Core.Mvc
+@model PagedList<ResultMessageDto>
 
 @{
     ViewData["Title"] = "Inbox";
     Layout = "~/Views/WebUI/Index.cshtml";
+
+    // Sayfalama (Pager) ayarlarını biraz daha şıklaştırıyoruz
+    var customOption = PagedListRenderOptions.Bootstrap4PageNumbersPlusPrevAndNext;
+    customOption.LinkToPreviousPageFormat = "Önceki";
+    customOption.LinkToNextPageFormat = "Sonraki";
+
+    // Kategori isimlerine göre renk sınıfı döndüren fonksiyonumuz
+    string GetCategoryColor(string categoryName)
+    {
+        if (string.IsNullOrEmpty(categoryName)) return "cat-default";
+
+        var name = categoryName.ToLower();
+        if (name.Contains("birincil")) return "cat-birincil";
+        if (name.Contains("sosyal")) return "cat-sosyal";
+        if (name.Contains("tanıtım") || name.Contains("tanitim")) return "cat-tanitimlar";
+        if (name.Contains("forum")) return "cat-forumlar";
+
+        return "cat-default";
+    }
 }
 
 <style>
-    /* Tabloyu Sabitliyoruz (Taşmaları Engeller) */
+    /* Tabloyu Sabitliyoruz */
     .table-inbox {
         width: 100%;
         table-layout: fixed;
@@ -47,7 +67,7 @@
         font-size: 13px;
     }
 
-    /* İŞTE SİHİRLİ KOD BURASI: Asla alt satıra inmez, sığmazsa ... koyar */
+    /* Hücre Taşma Engelleme */
     .truncate-cell {
         white-space: nowrap !important;
         overflow: hidden !important;
@@ -55,6 +75,74 @@
         vertical-align: middle !important;
         padding: 15px 10px !important;
     }
+
+    /* Kategori Renkleri */
+    .cat-birincil {
+        background-color: #F44336 !important;
+        color: white !important;
+    }
+
+    .cat-sosyal {
+        background-color: #2196F3 !important;
+        color: white !important;
+    }
+
+    .cat-tanitimlar {
+        background-color: #4CAF50 !important;
+        color: white !important;
+    }
+
+    .cat-forumlar {
+        background-color: #FF9800 !important;
+        color: white !important;
+    }
+
+    .cat-default {
+        background-color: #607D8B !important;
+        color: white !important;
+    }
+
+    /* PAGER ÖZEL TASARIMI (Temaya Uygun) */
+    .custom-pagination-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid #eee;
+    }
+
+    .custom-pagination-info {
+        font-size: 13px;
+        color: #777;
+    }
+
+        .custom-pagination-info strong {
+            color: #333;
+        }
+
+    .pagination-links .pagination {
+        margin: 0;
+    }
+
+    .pagination-links .page-item.active .page-link {
+        background-color: #00c292;
+        border-color: #00c292;
+        color: white;
+    }
+
+    .pagination-links .page-link {
+        color: #333;
+        border-radius: 4px;
+        margin: 0 3px;
+        border: 1px solid #eee;
+        transition: all 0.3s;
+    }
+
+        .pagination-links .page-link:hover {
+            background-color: #f5f5f5;
+            border-color: #ddd;
+        }
 </style>
 
 <div class="inbox-area">
@@ -76,76 +164,77 @@
                     <div class="inbox-btn-st-ls btn-toolbar">
                         <div class="btn-group ib-btn-gp active-hook nk-email-inbox">
                             <a href="/Default/Inbox" class="btn btn-default btn-sm"><i class="notika-icon notika-refresh"></i> Yenile</a>
-                            <button class="btn btn-default btn-sm"><i class="notika-icon notika-next"></i></button>
-                            <button class="btn btn-default btn-sm"><i class="notika-icon notika-down-arrow"></i></button>
                             <button class="btn btn-default btn-sm"><i class="notika-icon notika-trash"></i></button>
                             <button class="btn btn-default btn-sm"><i class="notika-icon notika-checked"></i></button>
                             <button class="btn btn-default btn-sm"><i class="notika-icon notika-promos"></i></button>
                         </div>
-                        <div class="btn-group ib-btn-gp active-hook nk-act nk-email-inbox">
-                            <button class="btn btn-default btn-sm"><i class="notika-icon notika-left-arrow"></i></button>
-                            <button class="btn btn-default btn-sm"><i class="notika-icon notika-right-arrow"></i></button>
+
+                        <div class="btn-group ib-btn-gp active-hook nk-act nk-email-inbox pull-right">
+                            @if (Model.HasPreviousPage)
+                            {
+                                <a href="@Url.Action("Inbox", "Default", new { page = Model.PageNumber - 1 })" class="btn btn-default btn-sm"><i class="notika-icon notika-left-arrow"></i></a>
+                            }
+                            else
+                            {
+                                <button class="btn btn-default btn-sm" disabled><i class="notika-icon notika-left-arrow"></i></button>
+                            }
+
+                            @if (Model.HasNextPage)
+                            {
+                                <a href="@Url.Action("Inbox", "Default", new { page = Model.PageNumber + 1 })" class="btn btn-default btn-sm"><i class="notika-icon notika-right-arrow"></i></a>
+                            }
+                            else
+                            {
+                                <button class="btn btn-default btn-sm" disabled><i class="notika-icon notika-right-arrow"></i></button>
+                            }
                         </div>
                     </div>
 
                     <div class="table-responsive">
                         <table class="table table-hover table-inbox">
                             <tbody>
-
                                 @foreach (var message in Model)
                                 {
                                     <tr onclick="window.location.href='/Default/ViewEmail/@message.Id';" class="@(message.IsRead ? "read" : "unread")">
-
                                         <td style="width: 50px; vertical-align: middle; padding: 15px 10px;">
                                             <label style="margin: 0; cursor: pointer;"><input type="checkbox" class="i-checks"></label>
                                         </td>
-
                                         <td class="truncate-cell" style="width: 25%;">
                                             <span class="mail-text" style="font-size: 14px;" title="Kimden: @message.Sender.Name @message.Sender.Surname">
                                                 Kimden: @message.Sender.Name @message.Sender.Surname
                                             </span>
                                         </td>
-
                                         <td class="truncate-cell" style="width: auto;">
-                                            <span class="label label-primary" style="font-size: 11px; padding: 4px 8px; margin-right: 8px; border-radius: 3px;">
+                                            <span class="label @GetCategoryColor(message.Category.Name)" style="font-size: 11px; padding: 4px 8px; margin-right: 8px; border-radius: 3px; border: none;">
                                                 @message.Category.Name
                                             </span>
-
-                                            <span class="mail-text" style="font-size: 14px;">
-                                                @message.Subject
-                                            </span>
-
-                                            <span class="mail-summary">
-                                                &nbsp;-&nbsp; @(string.IsNullOrEmpty(message.MessageDetail) ? "" : message.MessageDetail)
-                                            </span>
+                                            <span class="mail-text" style="font-size: 14px;">@message.Subject</span>
+                                            <span class="mail-summary">&nbsp;-&nbsp; @(string.IsNullOrEmpty(message.MessageDetail) ? "" : message.MessageDetail)</span>
                                         </td>
-
                                         <td style="width: 50px; text-align: center; vertical-align: middle; padding: 15px 10px;">
                                             @if (!message.IsRead)
                                             {
                                                 <i class="notika-icon notika-paperclip" style="color: #a5a5a5; font-size: 16px;"></i>
                                             }
                                         </td>
-
                                         <td style="width: 140px; text-align: right; vertical-align: middle; padding: 15px 10px; white-space: nowrap;">
                                             <span class="mail-text" style="font-size: 13px;">
                                                 @message.SendDate.ToString("dd MMM dddd", new System.Globalization.CultureInfo("tr-TR"))
                                             </span>
                                         </td>
-
                                     </tr>
                                 }
                             </tbody>
                         </table>
 
-                        <div class="pagination-inbox" style="margin-top: 20px; text-align: center;">
-                            <ul class="wizard-nav-ac">
-                                <li><a class="btn" href="#"><i class="notika-icon notika-back"></i></a></li>
-                                <li class="active"><a class="btn" href="#">1</a></li>
-                                <li><a class="btn" href="#">2</a></li>
-                                <li><a class="btn" href="#">3</a></li>
-                                <li><a class="btn" href="#"><i class="notika-icon notika-next-pro"></i></a></li>
-                            </ul>
+                        <div class="custom-pagination-wrapper">
+                            <div class="custom-pagination-info">
+                                Gösterilen: <strong>@Model.FirstItemOnPage</strong> - <strong>@Model.LastItemOnPage</strong> / Toplam: <strong>@Model.TotalItemCount</strong> mesaj
+                            </div>
+
+                            <div class="pagination-links">
+                                <pager asp-action="Inbox" asp-controller="Default" list="@Model" options="@customOption"></pager>
+                            </div>
                         </div>
 
                     </div>

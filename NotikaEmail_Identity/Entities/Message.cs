@@ -20,7 +20,8 @@ namespace NotikaEmail_Identity.Entities
         public Category Category { get; set; }
         public int CategoryId { get; set; }
 
-
+        //eklenen dosya yolu tutacak bakalım yapabılırsek
+        public string? AttachedFilePath { get; set; }
 
         //public bool IsGarbage { get; set; }
         //public bool IsDeleted { get; set; }

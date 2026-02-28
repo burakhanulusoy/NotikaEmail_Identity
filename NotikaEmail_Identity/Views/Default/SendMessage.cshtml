@@ -6,53 +6,127 @@
 }
 
 <style>
+    /* Genel Kart Tasarımı */
     .email-card {
-        border-radius: 8px;
-        border: 1px solid #eee;
+        border-radius: 12px;
+        border: none;
         background: #fff;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-        padding: 20px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        padding: 30px;
     }
 
     .email-card-header {
-        border-bottom: 2px solid #667eea;
-        margin-bottom: 20px;
-        padding-bottom: 10px;
+        border-bottom: 1px solid #f0f0f0;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
     }
 
         .email-card-header h2 {
             margin: 0;
-            color: #333;
-            font-size: 20px;
+            color: #2c3e50;
+            font-size: 22px;
             font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
+    /* Modern Input Alanları */
     .form-group label {
-        font-weight: 600;
-        color: #555;
+        font-weight: 500;
+        color: #6c757d;
         margin-bottom: 8px;
         display: block;
+        font-size: 14px;
     }
 
+    .modern-input {
+        border: 1px solid #e0e4e8;
+        border-radius: 8px;
+        padding: 12px 15px;
+        box-shadow: none;
+        transition: all 0.3s ease;
+        background-color: #f8f9fa;
+        width: 100%;
+        color: #333;
+    }
+
+        .modern-input:focus {
+            border-color: #667eea;
+            background-color: #fff;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+            outline: none;
+        }
+
+    .custom-select {
+        height: 48px;
+        cursor: pointer;
+    }
+
+    /* Gmail Tarzı Dosya Ekleme Alanı */
+    .attachment-section {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding-top: 15px;
+        border-top: 1px solid #f0f0f0;
+        margin-top: 10px;
+    }
+
+    .attachment-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: transparent;
+        color: #5f6368;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        margin: 0;
+    }
+
+        .attachment-btn:hover {
+            background-color: #f1f3f4;
+            color: #202124;
+        }
+
+    /* Seçilen Dosya İsmi Baloncuğu */
+    .file-name-badge {
+        display: none; /* Dosya seçilene kadar gizli */
+        align-items: center;
+        gap: 8px;
+        background: #f1f3f4;
+        color: #3c4043;
+        padding: 6px 14px;
+        border-radius: 16px;
+        font-size: 13px;
+        font-weight: 500;
+        border: 1px solid #e8eaed;
+    }
+
+    /* Gönder Butonu */
     .btn-send {
         background: #667eea;
         border: none;
         color: white;
-        padding: 10px 25px;
-        border-radius: 5px;
-        font-weight: bold;
+        padding: 12px 30px;
+        border-radius: 25px;
+        font-weight: 600;
+        font-size: 15px;
         transition: 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
         .btn-send:hover {
             background: #5a6cd6;
             color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
         }
-    /* Select kutusunun senin temanın stiliyle uyumlu olması için */
-    .custom-select {
-        height: 40px;
-        padding-top: 8px;
-    }
 </style>
 
 <div class="inbox-area">
@@ -69,75 +143,66 @@
                     </div>
 
                     <div class="email-card-body">
-                        <form  method="post">
+                        <form method="post" enctype="multipart/form-data">
 
                             <div class="row">
-                              
-
                                 <div class="col-lg-6 col-md-6 col-sm-12">
                                     <div class="form-group">
-                                        <label>E-posta Adresi</label>
-                                        <div class="nk-int-st">
-                                            <input type="email" asp-for="ReceiverEmail" class="form-control" name="ReceiverEmail" placeholder="ornek@email.com" required />
-                                        </div>
+                                        <label>Alıcı E-posta Adresi</label>
+                                        <input type="email" asp-for="ReceiverEmail" class="form-control modern-input" name="ReceiverEmail" placeholder="ornek@email.com" required />
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="row">
+                            <div class="row mt-3">
                                 <div class="col-lg-6 col-md-6 col-sm-12">
                                     <div class="form-group">
                                         <label>Kategori</label>
-                                        <div class="nk-int-st">
-                                            <select  asp-for="MessageCategoryId"  asp-items="@ViewBag.categories" class="form-control custom-select"  required>
-                                                <option value="" selected disabled>Kategori Seçiniz...</option>
-                                                
-                                            </select>
-                                        </div>
+                                        <select asp-for="MessageCategoryId" asp-items="@ViewBag.categories" class="form-control modern-input custom-select" required>
+                                            <option value="" selected disabled>Kategori Seçiniz...</option>
+                                        </select>
                                     </div>
                                 </div>
 
                                 <div class="col-lg-6 col-md-6 col-sm-12">
                                     <div class="form-group">
                                         <label>Konu</label>
-                                        <div class="nk-int-st">
-                                            <input type="text" class="form-control" asp-for="Subject" placeholder="Mesajınızın konusu" required />
-                                        </div>
+                                        <input type="text" class="form-control modern-input" asp-for="Subject" placeholder="Mesajınızın konusu" required />
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="row">
+                            <div class="row mt-3">
                                 <div class="col-lg-12">
                                     <div class="form-group">
                                         <label>Mesajınız</label>
-                                        <div class="nk-int-st">
-                                            <textarea class="form-control" asp-for="MessageDetail" rows="6" placeholder="Mesajınızı buraya yazın..." required></textarea>
-                                        </div>
+                                        <textarea class="form-control modern-input" asp-for="MessageDetail" rows="8" placeholder="Mesajınızı buraya yazın..." required></textarea>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="row mg-t-15">
-                                <div class="col-lg-12">
-                                    <div class="form-group">
-                                        <label>Dosya Ekle (İsteğe Bağlı)</label>
-                                        <div class="nk-int-st">
-                                            <input type="file" class="form-control" name="AttachedFile" style="padding-top: 5px;" />
-                                        </div>
-                                    </div>
+                            <div class="attachment-section d-flex justify-content-between align-items-center mt-4">
 
-                                    <span class="text-danger">@Html.ValidationSummary()</span>
+                                <div class="d-flex align-items-center">
+                                    <label for="file-upload" class="attachment-btn" title="Dosya Ekle">
+                                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+                                        </svg>
+                                    </label>
+                                    <input id="file-upload" type="file" name="AttachedFile" style="display: none;" onchange="showFileName(this)" />
+
+                                    <span id="file-name-display" class="file-name-badge">
+                                        <i class="notika-icon notika-file"></i> <span id="file-name-text"></span>
+                                    </span>
                                 </div>
+
+                                <button type="submit" class="btn btn-send waves-effect">
+                                    Mesajı Gönder <i class="notika-icon notika-right-arrow"></i>
+                                </button>
+
                             </div>
 
-                            <div class="row mg-t-20">
-                                <div class="col-lg-12 text-right">
-                                    <button  class="btn btn-send waves-effect">
-                                        <i class="notika-icon notika-right-arrow"></i> Mesajı Gönder
-                                    </button>
-                                </div>
-                            </div>
+                            <span class="text-danger d-block mt-2">@Html.ValidationSummary()</span>
 
                         </form>
                     </div>
@@ -147,3 +212,33 @@
         </div>
     </div>
 </div>
+
+<script>
+    function showFileName(input) {
+        const displayBadge = document.getElementById('file-name-display');
+        const textSpan = document.getElementById('file-name-text');
+
+        if (input.files && input.files.length > 0) {
+            textSpan.textContent = input.files[0].name;
+            displayBadge.style.display = 'inline-flex'; // Dosya seçilince balonu göster
+        } else {
+            displayBadge.style.display = 'none'; // İptal edilirse gizle
+        }
+    }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

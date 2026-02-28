@@ -128,7 +128,7 @@
                             </div>
                         </div>
 
-                        <form  method="post" class="p-6 sm:p-8 space-y-8">
+                        <form enctype="multipart/form-data" method="post" class="p-6 sm:p-8 space-y-8">
 
                             <input type="hidden" asp-for="Id" />
                             <input type="hidden" asp-for="CreatedDate" />
@@ -136,20 +136,27 @@
                             <div class="flex flex-col items-center justify-center space-y-6">
                                 <div class="relative group">
                                     <div class="size-44 rounded-full border-2 border-dashed border-primary/40 bg-slate-50 dark:bg-slate-800/40 flex items-center justify-center transition-all group-hover:border-primary group-hover:bg-primary/5 overflow-hidden relative">
-                                        <div class="absolute inset-0 bg-center bg-cover transition-opacity duration-300" style='background-image: url("@(Model?.ImageUrl ?? "https://via.placeholder.com/150")");'></div>
+                                        <div id="profile-preview" class="absolute inset-0 bg-center bg-cover transition-opacity duration-300" style='background-image: url("@(Model?.ImageUrl ?? "https://via.placeholder.com/150")");'></div>
                                     </div>
                                 </div>
 
+
+
+
                                 <div class="w-full max-w-md space-y-2">
-                                    <label class="text-sm font-semibold text-slate-700 dark:text-slate-200" asp-for="ImageUrl">Profil Fotoğrafı URL'si</label>
-                                    <div class="relative">
-                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <span class="material-symbols-outlined text-slate-400 text-[20px]">link</span>
-                                        </div>
-                                        <input asp-for="ImageUrl" type="url" placeholder="https://ornek.com/resim.jpg" class="block w-full pl-10 pr-3 py-3 border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary bg-slate-50 dark:bg-slate-800/50 transition-all shadow-sm" />
+                                    <label class="text-sm font-semibold text-slate-700 dark:text-slate-200">Profil Fotoğrafı</label>
+                                    <div class="flex items-center justify-center w-full">
+                                        <label for="ImageFile" class="flex flex-col items-center justify-center w-full h-32 border-2 border-slate-300 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 dark:border-slate-600 hover:border-primary transition-all group/file">
+                                            <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                                <span class="material-symbols-outlined text-4xl text-slate-400 group-hover/file:text-primary transition-colors mb-2">cloud_upload</span>
+                                                <p class="mb-1 text-sm text-slate-500 dark:text-slate-400"><span class="font-semibold text-primary">Resim seçmek</span> veya sürüklemek için tıklayın</p>
+                                                <p class="text-xs text-slate-400">PNG, JPG veya JPEG</p>
+                                            </div>
+                                            <input asp-for="ImageFile" type="file" accept="image/png, image/jpeg, image/jpg" class="hidden" id="ImageFile" />
+                                        </label>
                                     </div>
-                                    <p class="text-[11px] text-slate-400 px-1">Şimdilik profil fotoğrafınızı bir web bağlantısı (URL) ile güncelleyebilirsiniz.</p>
                                 </div>
+
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4 border-t border-slate-100 dark:border-slate-800">
@@ -209,7 +216,7 @@
                                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                             <span class="material-symbols-outlined text-slate-400 text-[20px]">mail</span>
                                         </div>
-                                        <input asp-for="Email" type="email" class="block w-full pl-10 pr-3 py-3 border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary bg-slate-50 dark:bg-slate-800/50 transition-all shadow-sm" />
+                                        <input readonly asp-for="Email" type="email" class="block w-full pl-10 pr-3 py-3 border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary bg-slate-50 dark:bg-slate-800/50 transition-all shadow-sm" />
                                     </div>
                                 </div>
                             </div>
@@ -260,6 +267,39 @@
                                 </div>
                             </div>
 
+                            <div class="pt-6 border-t border-slate-100 dark:border-slate-800 space-y-4">
+                                <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary">share</span>
+                                     Şifre Giriniz
+                                </h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div class="space-y-2">
+                                        <label class="text-sm font-semibold text-slate-700 dark:text-slate-200" asp-for="TwitterLink">Twitter (X)</label>
+                                        <div class="relative">
+                                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <i class="fab fa-x-twitter text-slate-400 text-[18px]"></i>
+                                            </div>
+                                            <input asp-for="CurrentPassword" placeholder="******" type="password" class="block w-full pl-10 pr-3 py-3 border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary bg-slate-50 dark:bg-slate-800/50 transition-all shadow-sm" />
+                                        </div>
+                                    </div>
+                                    <div class="col-span-1 md:col-span-2 mt-4">
+                                        @if (!ViewData.ModelState.IsValid)
+                                        {
+                                            <div class="p-4 rounded-lg bg-red-50 border border-red-200 dark:bg-red-900/10 dark:border-red-900/50" role="alert">
+                                                <div class="flex items-center gap-2 mb-2">
+                                                    <span class="material-symbols-outlined text-red-600 dark:text-red-400">error</span>
+                                                    <h3 class="text-sm font-bold text-red-800 dark:text-red-400">Lütfen aşağıdaki hataları düzeltin:</h3>
+                                                </div>
+                                                <div class="text-sm text-red-700 dark:text-red-300 pl-8">
+                                                    @Html.ValidationSummary(false, "", new { @class = "list-disc list-inside space-y-1" })
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+
                             <div class="flex flex-col sm:flex-row items-center justify-end gap-4 pt-6 border-t border-slate-100 dark:border-slate-800">
                                 <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                                     <a href="/Profile/Index" class="w-full sm:w-auto px-6 py-3 rounded-lg text-sm font-bold text-slate-600 text-center dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
@@ -279,3 +319,58 @@
     </div>
 </body>
 </html>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    // Resim seçildiğinde tetiklenecek fonksiyon
+    document.getElementById('ImageFile').addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                // Seçilen resmi yuvarlak div'in arka planı yap
+                document.getElementById('profile-preview').style.backgroundImage = 'url(' + event.target.result + ')';
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+
+<script>
+    // Başarılı mesajı varsa SweetAlert ile göster ve SONRA yönlendir
+    @if (ViewBag.IsSuccess == true)
+    {
+            <text>
+            Swal.fire({
+                title: 'Harika!',
+                text: 'Profil bilgileriniz başarıyla güncellendi!',
+                icon: 'success',
+                confirmButtonText: 'Tamam',
+                confirmButtonColor: '#00c230'
+            }).then((result) => {
+                // Kullanıcı Tamam'a tıkladığında Index sayfasına git
+                if (result.isConfirmed) {
+                    window.location.href = '/Profile/Index';
+                }
+            });
+            </text>
+    }
+</script>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Eğer ModelState geçersizse (yani bir hata fırlatıldıysa)
+        @if (!ViewData.ModelState.IsValid)
+        {
+                <text>
+                // CurrentPassword ID'li elemana (şifre kutusu) yumuşak bir şekilde kaydır
+                var passwordInput = document.getElementById('CurrentPassword');
+                if(passwordInput) {
+                    passwordInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                </text>
+        }
+    });
+</script>

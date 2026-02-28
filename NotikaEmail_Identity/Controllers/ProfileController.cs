@@ -34,9 +34,56 @@ namespace NotikaEmail_Identity.Controllers
         public async Task<IActionResult> UpdateProfil(UpdateUserDto  dto)
         {
 
+            var user = await _userManager.FindByNameAsync(User.Identity.Name);
+
+            bool passwordCheck = await _userManager.CheckPasswordAsync(user,dto.CurrentPassword);
+
+            if(!passwordCheck)
+            {
+                ModelState.AddModelError("", "Şifreniz hatalı lütfen kontrol ediniz");
+                return View(dto);
+            }
+
+            if (dto.ImageFile is not null)
+            {
+                // 1. Gelen dosyanın uzantısını alıp küçük harfe çeviriyoruz
+                var extension = Path.GetExtension(dto.ImageFile.FileName).ToLowerInvariant();
+
+                // 2. İzin verdiğimiz uzantıların bir listesi
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+
+                // 3. Eğer gelen uzantı bizim listede yoksa işlemi durdur ve hata dön
+                if (!allowedExtensions.Contains(extension))
+                {
+                    ModelState.AddModelError(string.Empty, "Lütfen sadece resim formatında (.jpg, .jpeg, .png, .gif) bir dosya seçin!");
+                    return View(dto);
+                }
+
+                // Uzantı sorunsuzsa normal kayıt işlemine devam ediyoruz
+                var currentDirectory = Directory.GetCurrentDirectory();
+                var saveDirectory = Path.Combine(currentDirectory, "wwwroot", "UserImagess");
+
+                if (!Directory.Exists(saveDirectory))
+                {
+                    Directory.CreateDirectory(saveDirectory);
+                }
+
+                var ImageName = Guid.NewGuid() + extension;
+                var saveLocation = Path.Combine(saveDirectory, ImageName);
+
+                using var stream = new FileStream(saveLocation, FileMode.Create);
+                await dto.ImageFile.CopyToAsync(stream);
+
+                dto.ImageUrl = "/UserImagess/" + ImageName;
+            }
+
+
+
+
             await _userService.UpdateAsync(dto);
 
-            return RedirectToAction("Index");
+            ViewBag.IsSuccess = true;
+            return View(dto);
 
         }
 

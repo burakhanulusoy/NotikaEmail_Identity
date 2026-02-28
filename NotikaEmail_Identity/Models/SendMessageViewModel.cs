@@ -9,7 +9,7 @@ namespace NotikaEmail_Identity.Models
         public string MessageDetail { get; set; }
         public int MessageCategoryId { get; set; }
 
-
+        public IFormFile? AttachedFile { get; set; }
 
     }
 }
