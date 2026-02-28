@@ -6,7 +6,7 @@ using System.Security.Claims;
 
 namespace NotikaEmail_Identity.Controllers
 {
-    public class LoginController(SignInManager<AppUser> _signInManager,UserManager<AppUser> _userManager) : Controller
+    public class LoginController(SignInManager<AppUser> _signInManager,UserManager<AppUser> _userManager,ILogger<LoginController> _logger) : Controller
     {
 
 
@@ -44,6 +44,8 @@ namespace NotikaEmail_Identity.Controllers
 
             if(!result.Succeeded)
             {
+                // HATA LOGU (Seq'te sarı renkte dikkat çekecek!)
+                _logger.LogWarning("Güvenlik Uyarısı: {UserEmail} adresine sahip kişi hatalı şifre ile sisteme girmeye çalıştı!", model.Email);
                 ModelState.AddModelError("", "Email veya şifre hatalı.");
                 return View(model);
             }
@@ -53,7 +55,7 @@ namespace NotikaEmail_Identity.Controllers
                 ModelState.AddModelError("", "Kayıtlı emailiniz aktifleştirilmemiş lütfen kontrol edin.");
                 return View(model);
             }
-
+            _logger.LogInformation("Sistem İşlemi: {UserEmail} adlı kullanıcı sisteme başarıyla giriş yaptı.", user.Email);
 
 
 
@@ -96,6 +98,8 @@ namespace NotikaEmail_Identity.Controllers
 
             if (signInResult.Succeeded)
             {
+                // GOOGLE İLE BAŞARILI GİRİŞ LOGU
+                _logger.LogInformation("Sistem İşlemi: Bir kullanıcı Google hesabı ile sisteme başarıyla giriş yaptı. ProviderKey: {Key}", info.ProviderKey);
                 return RedirectToAction("Inbox", "Default"); // Direkt içeri al
             }
 
@@ -152,6 +156,11 @@ namespace NotikaEmail_Identity.Controllers
 
                     // Son olarak adamı oturum açmış şekilde sisteme alıyoruz
                     await _signInManager.SignInAsync(user, isPersistent: false);
+
+
+                    _logger.LogInformation("Sistem İşlemi: {UserEmail} adlı kullanıcı sisteme Google ile YENİ KAYIT oldu ve giriş yaptı.", email);
+
+
                     return RedirectToAction("Inbox", "Default");
                 }
             }

@@ -12,10 +12,25 @@ using NotikaEmail_Identity.Services.MessageServices;
 using NotikaEmail_Identity.Services.SendEmailServices;
 using NotikaEmail_Identity.Services.UserServices;
 using NotikaEmail_Identity.Validations;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+
+
+// --- SERÝLOG VE SEQ AYARLARI BURAYA ---
+// --- SERÝLOG VE SEQ AYARLARI BURAYA ---
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning) // BÜTÜN ÇÖPÜ SUSTURAN SÝHÝR 1
+    .MinimumLevel.Override("System", Serilog.Events.LogEventLevel.Warning)    // BÜTÜN ÇÖPÜ SUSTURAN SÝHÝR 2
+    .WriteTo.Console()
+    .WriteTo.Seq("http://localhost:5341")
+    .CreateLogger();
+
+builder.Host.UseSerilog(); // ASP.NET Core'a "Loglama iþi artýk Serilog'da" diyoruz.
 
 
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -63,6 +78,18 @@ builder.Services.AddAuthentication()
         };
     });
 
+
+
+
+
+
+
+
+
+
+
+
+
 builder.Services.AddAutoMapper(typeof(CategoryMappings).Assembly);
 
 builder.Services.AddFluentValidationAutoValidation().
@@ -82,7 +109,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddScoped<ISendEmail, SendEmail>();
 
-
+builder.Services.AddScoped<SeqLogService>();
 
 builder.Services.AddControllersWithViews();
 
@@ -105,6 +132,9 @@ app.UseHttpsRedirection();
 //
 app.UseStatusCodePagesWithReExecute("/PageNotFound/Index", "?code={0}");
 app.UseRouting();
+
+// Bunu ekle: Gelen HTTP isteklerini Seq'e çok þýk ve tek satýrda loglar!
+app.UseSerilogRequestLogging();
 
 app.UseAuthentication();
 

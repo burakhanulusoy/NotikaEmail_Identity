@@ -15,7 +15,8 @@ namespace NotikaEmail_Identity.Controllers
     public class DefaultController(IMessageService _messageService,
                                    UserManager<AppUser> _userManager,
                                    ICategoryService _categoryService,
-                                   IWebHostEnvironment _hostEnvironment) : Controller
+                                   IWebHostEnvironment _hostEnvironment,
+                                   ILogger<DefaultController> _logger) : Controller
     {
 
         public async Task<IActionResult> Inbox(int page = 1,int pageSize=2)
@@ -54,6 +55,8 @@ namespace NotikaEmail_Identity.Controllers
             {
                 messageToUpdate.IsRead = true;
                 await _messageService.UpdateAsync(messageToUpdate);
+                // MESAJ OKUNDU LOGU (Sadece ilk defa okunduğunda log atarız, gereksiz kalabalık olmasın)
+                _logger.LogInformation("Bilgi: {MessageId} ID'li mesaj ilk kez okundu olarak işaretlendi.", id);
             }
 
             var message = await _messageService.GetByIdWithReceiverAsync(id);
@@ -117,6 +120,10 @@ namespace NotikaEmail_Identity.Controllers
 
             if(receiver is null)
             {
+                // ŞÜPHELİ İŞLEM LOGU: Olmayan birine mail atmaya çalışıyor!
+                _logger.LogWarning("Şüpheli İşlem: {SenderEmail} adlı kullanıcı sistemde olmayan bir adrese ({ReceiverEmail}) mesaj göndermeye çalıştı.", sender.Email, dto.ReceiverEmail);
+
+
                 ModelState.AddModelError("", "Bu maile sahip bir mail bulunamadı");
                 return View(dto);
             }
@@ -171,6 +178,10 @@ namespace NotikaEmail_Identity.Controllers
 
 
             await _messageService.CreateAsync(message);
+            // BAŞARILI MESAJ GÖNDERİM LOGU (Ek dosya var mı yok mu onu bile yazdırdık!)
+            _logger.LogInformation("Sistem İşlemi: {SenderEmail} adlı kullanıcı, {ReceiverEmail} adresine mesaj gönderdi. Konu: '{Subject}' | Ek Dosya: {HasAttachment}",
+                sender.Email, receiver.Email, dto.Subject, attachedFilePath != null ? "Var" : "Yok");
+
             return RedirectToAction("SendBox");
 
 
@@ -180,7 +191,11 @@ namespace NotikaEmail_Identity.Controllers
         public IActionResult DownloadAttachment(string filePath)
         {
             if (string.IsNullOrEmpty(filePath))
+            {
+                _logger.LogWarning("Hatalı İstek: Bir kullanıcı boş bir dosya yolunu indirmeye çalıştı.");
                 return NotFound("Dosya yolu bulunamadı.");
+
+            }
 
             // Dosya yolundan sadece ismini alıyoruz (Örn: ae1038...-tahlil.pdf)
             var fileName = System.IO.Path.GetFileName(filePath);
@@ -190,11 +205,20 @@ namespace NotikaEmail_Identity.Controllers
 
             // Eğer klasörde gerçekten dosya yoksa hata fırlat
             if (!System.IO.File.Exists(path))
+            {
+                // ÇOK KRİTİK LOG: Dosya veritabanında var ama klasörde yok (Biri silmiş olabilir!)
+                _logger.LogError("Sistem Hatası: İndirilmek istenen '{FileName}' adlı dosya sunucu klasöründe bulunamadı! (Path: {Path})", fileName, path);
                 return NotFound("Dosya sunucuda bulunamadı.");
+
+            }
 
             // Dosyayı byte olarak okuyup tarayıcıya "octet-stream" formatında yolluyoruz
             // octet-stream tarayıcıya şunu söyler: "Bu bir indirme dosyasıdır, sakın sekmede açmaya çalışma!"
             byte[] fileBytes = System.IO.File.ReadAllBytes(path);
+
+            // DOSYA İNDİRME LOGU
+            _logger.LogInformation("Sistem İşlemi: '{FileName}' adlı ek dosya sunucudan başarıyla indirildi.", fileName);
+
             return File(fileBytes, "application/octet-stream", fileName);
         }
 

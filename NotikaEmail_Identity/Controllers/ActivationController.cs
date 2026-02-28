@@ -8,7 +8,10 @@ using System.Threading.Tasks;
 namespace NotikaEmail_Identity.Controllers
 {
     
-    public class ActivationController(UserManager<AppUser> _userManager,IUserService _userService,ISendEmail _sendEmail) : Controller
+    public class ActivationController(UserManager<AppUser> _userManager,
+        IUserService _userService,
+        ISendEmail _sendEmail,
+        ILogger<ActivationController> _logger) : Controller
     {
         public async Task<IActionResult> UserActivation()
         {
@@ -34,6 +37,10 @@ namespace NotikaEmail_Identity.Controllers
 
             if(code != userCodeParameter)
             {
+
+                // HATA LOGU (Seq'te Sarı Renkte Uyarı Verir)
+                _logger.LogWarning("Güvenlik Uyarısı: {UserEmail} kullanıcısı hatalı aktivasyon kodu girdi! Girilen Kod: {DenemeKodu}", email, userCodeParameter);
+
                 ModelState.AddModelError("", "Aktivasyon kodunuz hatalı lütfen kontrol edin.");
                 ViewBag.Email = email;
                 return View();
@@ -46,6 +53,10 @@ namespace NotikaEmail_Identity.Controllers
 
             if (!updateResult.Succeeded)
             {
+
+                // SİSTEM HATASI LOGU (Seq'te Kırmızı Renk)
+                _logger.LogError("Sistem Hatası: {UserEmail} kullanıcısının mail onaylama işlemi veritabanına kaydedilirken hata oluştu!", email);
+
                 foreach (var error in updateResult.Errors)
                 {
                     ModelState.AddModelError("", error.Description);
@@ -55,7 +66,8 @@ namespace NotikaEmail_Identity.Controllers
                 
             }
 
-
+            // BAŞARILI İŞLEM LOGU (İşte asıl görmek istediğimiz mavi/yeşil log)
+            _logger.LogInformation("Sistem İşlemi: {UserEmail} adlı kullanıcı e-posta adresini başarıyla doğruladı ve hesabını aktifleştirdi.", email);
 
 
             return RedirectToAction("SignIn", "Login");
@@ -76,12 +88,18 @@ namespace NotikaEmail_Identity.Controllers
             var user = await _userManager.FindByEmailAsync (email);
             if (user == null)
             {
+                // ŞÜPHELİ İŞLEM LOGU (Sistemde olmayan bir maile kod istenirse)
+                _logger.LogWarning("Şüpheli İşlem: Sistemde kayıtlı olmayan bir e-posta adresi ({UserEmail}) için yeni aktivasyon kodu talep edildi.", email);
+
                 ModelState.AddModelError("", "Bu e-posta adresine ait kullanıcı bulunamadı.");
                 return View();
             }
 
             if (user.EmailConfirmed)
             {
+                // BİLGİ LOGU
+                _logger.LogInformation("Bilgi: {UserEmail} kullanıcısı hesabı zaten onaylı olduğu halde yeni aktivasyon kodu talep etti.", email);
+
                 ModelState.AddModelError("", "Hesabınız zaten onaylanmış. Giriş yapabilirsiniz.");
                 return View();
             }
@@ -94,6 +112,10 @@ namespace NotikaEmail_Identity.Controllers
 
             _sendEmail.SendEmail(user.Email, newCode);
             TempData["EmailMove"] = user.Email;
+
+            // YENİ KOD GÖNDERİM LOGU
+            _logger.LogInformation("Sistem İşlemi: {UserEmail} adlı kullanıcıya başarıyla YENİ bir aktivasyon kodu gönderildi.", email);
+
             return RedirectToAction("UserActivation");
 
 

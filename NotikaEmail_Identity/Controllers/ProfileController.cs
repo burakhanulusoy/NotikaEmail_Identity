@@ -9,7 +9,10 @@ using NotikaEmail_Identity.Services.UserServices;
 namespace NotikaEmail_Identity.Controllers
 {
     [Authorize]
-    public class ProfileController(UserManager<AppUser> _userManager,IUserService _userService,SignInManager<AppUser> _signInManager) : Controller
+    public class ProfileController(UserManager<AppUser> _userManager,
+        IUserService _userService,
+        SignInManager<AppUser> _signInManager,
+        ILogger<ProfileController> _logger) : Controller
     {
         public async Task<IActionResult> Index()
         {
@@ -40,6 +43,9 @@ namespace NotikaEmail_Identity.Controllers
 
             if(!passwordCheck)
             {
+                // GÜVENLİK UYARISI: Şifresini yanlış giren biri var
+                _logger.LogWarning("Güvenlik Uyarısı: {UserEmail} adlı kullanıcı profilini güncellemeye çalışırken mevcut şifresini HATALI girdi.", user.Email);
+
                 ModelState.AddModelError("", "Şifreniz hatalı lütfen kontrol ediniz");
                 return View(dto);
             }
@@ -55,6 +61,9 @@ namespace NotikaEmail_Identity.Controllers
                 // 3. Eğer gelen uzantı bizim listede yoksa işlemi durdur ve hata dön
                 if (!allowedExtensions.Contains(extension))
                 {
+                    // ŞÜPHELİ DOSYA LOGU
+                    _logger.LogWarning("Sistem Uyarısı: {UserEmail} adlı kullanıcı yasaklı bir dosya uzantısı ({Extension}) yüklemeye çalıştı!", user.Email, extension);
+
                     ModelState.AddModelError(string.Empty, "Lütfen sadece resim formatında (.jpg, .jpeg, .png, .gif) bir dosya seçin!");
                     return View(dto);
                 }
@@ -75,10 +84,14 @@ namespace NotikaEmail_Identity.Controllers
                 await dto.ImageFile.CopyToAsync(stream);
 
                 dto.ImageUrl = "/UserImagess/" + ImageName;
+                // DOSYA YÜKLEME LOGU
+                _logger.LogInformation("Sistem İşlemi: {UserEmail} adlı kullanıcı profil resmini başarıyla güncelledi. Yeni Dosya: {ImageName}", user.Email, ImageName);
+
             }
 
 
-
+            // BAŞARILI GÜNCELLEME LOGU
+            _logger.LogInformation("Sistem İşlemi: {UserEmail} adlı kullanıcı profil bilgilerini başarıyla güncelledi.", user.Email);
 
             await _userService.UpdateAsync(dto);
 
@@ -119,10 +132,13 @@ namespace NotikaEmail_Identity.Controllers
                     // Identity'nin "Eski şifre yanlış" hatasını yakalıyoruz
                     if (error.Code == "PasswordMismatch")
                     {
+                        // ŞİFRE DEĞİŞTİRME HATASI LOGU
+                        _logger.LogWarning("Güvenlik Uyarısı: {UserEmail} kullanıcısı şifresini değiştirmeye çalıştı ancak mevcut şifresini yanlış girdi.", user.Email);
                         ModelState.AddModelError(string.Empty, "Mevcut şifrenizi yanlış girdiniz.");
                     }
                     else
                     {
+                        _logger.LogWarning("Sistem Uyarısı: {UserEmail} kullanıcısının şifre değişimi kural hatası nedeniyle başarısız oldu: {ErrorCode}", user.Email, error.Code);
                         // Diğer olası Identity hatalarını olduğu gibi basıyoruz
                         ModelState.AddModelError(error.Code, error.Description);
                     }
@@ -130,6 +146,8 @@ namespace NotikaEmail_Identity.Controllers
                 return View(model);
             }
 
+            // KRİTİK LOG: Şifre değişti!
+            _logger.LogInformation("Sistem İşlemi: {UserEmail} adlı kullanıcı şifresini başarıyla DEĞİŞTİRDİ. Oturum kapatılıyor.", user.Email);
             await _signInManager.SignOutAsync();
 
             return RedirectToAction("SignIn", "Login");
