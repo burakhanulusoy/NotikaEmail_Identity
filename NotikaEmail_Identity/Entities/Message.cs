@@ -23,9 +23,9 @@ namespace NotikaEmail_Identity.Entities
         //eklenen dosya yolu tutacak bakalım yapabılırsek
         public string? AttachedFilePath { get; set; }
 
-        //public bool IsGarbage { get; set; }
-        //public bool IsDeleted { get; set; }
-        //public bool IsArchive { get; set; }
+        
+        public bool IsDeleted { get; set; }
+        
 
 
 

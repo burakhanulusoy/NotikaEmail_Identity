@@ -38,8 +38,21 @@ namespace NotikaEmail_Identity.Repositories.MessageRepositories
                                .Include(x => x.Sender)
                                .Include(x => x.Receiver)
                                .Where(filter)
+                               .Where(x=>x.IsDeleted==false)
                                .OrderByDescending(x=>x.Id)
                                .ToListAsync();
+
+        }
+
+        public async Task<List<Message>> GetAllGarbageBoxAsync(int id)
+        {
+           
+            return await _table.Where(x=>x.ReceiverId==id)
+                .Include(x=>x.Sender)
+                .Include(x=> x.Receiver)
+                .Include(x=>x.Category)
+                .Where(x=>x.IsDeleted==true)
+                .AsNoTracking().ToListAsync();
 
         }
 
@@ -77,6 +90,19 @@ namespace NotikaEmail_Identity.Repositories.MessageRepositories
                 .OrderByDescending(x=>x.Id).Take(5).ToListAsync();
 
             return messages;
+
+        }
+
+        public async Task<List<Message>> GetMessagesByCategoryId(int id, int userId)
+        {
+            
+
+            var messages = await _table.Where(x=>x.CategoryId==id).Where(x=>x.ReceiverId==userId).Include(x=>x.Sender).Include(x=>x.Receiver).
+                Include(x=>x.Category).Where(x=>x.IsDeleted==false).ToListAsync();
+
+
+            return messages;
+
 
         }
 

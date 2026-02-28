@@ -26,6 +26,7 @@ namespace NotikaEmail_Identity.DTOs.MessageDtos
         public string? AttachedFilePath { get; set; }
 
 
+        public bool IsDeleted { get; set; }
 
     }
 }

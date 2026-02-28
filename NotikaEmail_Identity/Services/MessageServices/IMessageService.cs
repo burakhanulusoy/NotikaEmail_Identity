@@ -25,5 +25,12 @@ namespace NotikaEmail_Identity.Services.MessageServices
         Task<List<ResultMessageDto>> PeopleISentMessagesTo(int id);
 
 
+        Task<List<ResultMessageDto>> GetAllGarbageBoxAsync(int id);
+
+
+        Task<List<ResultMessageDto>> GetMessagesByCategoryId(int id,int userId);
+
+
+
     }
 }

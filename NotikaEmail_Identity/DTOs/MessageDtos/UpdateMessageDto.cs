@@ -19,5 +19,8 @@ namespace NotikaEmail_Identity.DTOs.MessageDtos
 
         public ResultCategoryDto Category { get; set; }
         public int CategoryId { get; set; }
+    
+        public bool IsDeleted { get; set; }
+
     }
 }

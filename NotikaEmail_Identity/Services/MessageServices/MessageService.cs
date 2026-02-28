@@ -47,6 +47,14 @@ namespace NotikaEmail_Identity.Services.MessageServices
             return _mapper.Map<List<ResultMessageDto>>(messages);
         }
 
+        public async Task<List<ResultMessageDto>> GetAllGarbageBoxAsync(int id)
+        {
+        
+            var messages = await _messageRepository.GetAllGarbageBoxAsync(id);
+            return _mapper.Map<List<ResultMessageDto>>(messages);
+
+        }
+
         public async Task<UpdateMessageDto> GetByIdAsync(int id)
         {
            
@@ -86,6 +94,14 @@ namespace NotikaEmail_Identity.Services.MessageServices
 
             var messages = await _messageRepository.GetLast5DontReadMessageAsync(id);
             return _mapper.Map<List<ResultMessageDto>>(messages);
+
+        }
+
+        public async Task<List<ResultMessageDto>> GetMessagesByCategoryId(int id, int userId)
+        {
+            var messages = await _messageRepository.GetMessagesByCategoryId(id,userId);
+            return _mapper.Map<List<ResultMessageDto>>(messages);
+
 
         }
 

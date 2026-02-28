@@ -2,28 +2,29 @@
 @model PagedList<ResultMessageDto>
 
 @{
-    ViewData["Title"] = "Inbox";
+    ViewData["Title"] = "GetMessagesByCategoryId";
     Layout = "~/Views/WebUI/Index.cshtml";
 
-    // Sayfalama (Pager) ayarlarını biraz daha şıklaştırıyoruz
+    // Pager Ayarları
     var customOption = PagedListRenderOptions.Bootstrap4PageNumbersPlusPrevAndNext;
     customOption.LinkToPreviousPageFormat = "Önceki";
     customOption.LinkToNextPageFormat = "Sonraki";
 
-    // Kategori isimlerine göre renk sınıfı döndüren fonksiyonumuz
+    // Kategori isimlerine göre renk sınıfı döndüren sihirli fonksiyonumuz
     string GetCategoryColor(string categoryName)
     {
         if (string.IsNullOrEmpty(categoryName)) return "cat-default";
 
         var name = categoryName.ToLower();
-        if (name.Contains("birincil")) return "cat-birincil";
-        if (name.Contains("sosyal")) return "cat-sosyal";
-        if (name.Contains("tanıtım") || name.Contains("tanitim")) return "cat-tanitimlar";
-        if (name.Contains("forum")) return "cat-forumlar";
+        if (name.Contains("birincil")) return "cat-birincil";   // Kırmızı
+        if (name.Contains("sosyal")) return "cat-sosyal";       // Mavi
+        if (name.Contains("tanıtım") || name.Contains("tanitim")) return "cat-tanitimlar"; // Yeşil
+        if (name.Contains("forum")) return "cat-forumlar";      // Turuncu
 
-        return "cat-default";
+        return "cat-default"; // Diğer her şey için Gri/Siyah
     }
 }
+
 
 <style>
     /* Tabloyu Sabitliyoruz */
@@ -253,6 +254,7 @@
         </div>
     </div>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>

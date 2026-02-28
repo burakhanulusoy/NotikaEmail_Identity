@@ -26,6 +26,14 @@ namespace NotikaEmail_Identity.Repositories.MessageRepositories
         Task<List<Message>> PeopleISentMessagesTo(int id);
 
 
+        //çöp kutuus getir id vercem ve ısdeletde gore
+        Task<List<Message>> GetAllGarbageBoxAsync(int id);
+
+
+        //category id sine göre getirmek 
+        Task<List<Message>> GetMessagesByCategoryId(int id,int userId);
+
+
 
     }
 }

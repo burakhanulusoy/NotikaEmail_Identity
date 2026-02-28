@@ -22,7 +22,7 @@ namespace NotikaEmail_Identity.Controllers
                                    SignInManager<AppUser> signInManager) : Controller
     {
 
-        public async Task<IActionResult> Inbox(int page = 1,int pageSize=2)
+        public async Task<IActionResult> Inbox(int page = 1,int pageSize=12)
         {
 
 
@@ -202,7 +202,8 @@ namespace NotikaEmail_Identity.Controllers
                 SendDate = DateTime.Now,
                 CategoryId = dto.MessageCategoryId,
                 IsRead = false,
-                AttachedFilePath = attachedFilePath
+                AttachedFilePath = attachedFilePath,
+                IsDeleted=false
             };
 
 
@@ -278,6 +279,83 @@ namespace NotikaEmail_Identity.Controllers
 
 
         }
+
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteMessages(List<int> selectedIds)
+        {
+            // Eğer hiçbir şey seçilmeden post edildiyse direkt geri yolla
+            if (selectedIds == null || !selectedIds.Any())
+            {
+                return RedirectToAction("Inbox");
+            }
+
+            // Seçilen tüm ID'leri dön
+            foreach (var id in selectedIds)
+            {
+                var message = await _messageService.GetByIdAsync(id);
+
+                if (message != null)
+                {
+                    // Mesajın çöp kutusuna gitmesi için gerekli property'i güncelle
+                    message.IsDeleted = true; // Kendi property ismine göre düzelt
+
+                    await _messageService.UpdateAsync(message);
+                }
+            }
+
+            // İşlem başarıyla bitince sayfayı yenilemiş gibi Inbox'a geri dön
+            return RedirectToAction("Inbox");
+        }
+
+
+        public async Task<IActionResult> GarbageBox(int page = 1, int pageSize = 12)
+        {
+
+            var user = await _userManager.FindByNameAsync(User.Identity.Name);
+
+            if (user == null)
+            {
+                await signInManager.SignOutAsync();
+                return RedirectToAction("SignIn", "Login");
+            }
+
+
+
+
+            var messages = await _messageService.GetAllGarbageBoxAsync(user.Id);
+
+            var values = new PagedList<ResultMessageDto>(messages.AsQueryable(), page, pageSize);
+
+            return View(values);
+
+
+        }
+
+
+        public async Task<IActionResult> GetMessagesByCategoryId(int id,int page=1,int pageSize=12)
+        {
+
+            var user = await _userManager.FindByNameAsync(User.Identity.Name);
+
+
+            var messages = await _messageService.GetMessagesByCategoryId(id,user.Id);
+            var values = new PagedList<ResultMessageDto>(messages.AsQueryable(), page, pageSize);
+
+            return View(values);
+
+        }
+
+
+
+
+
+
+
+
+
+
+
 
 
 
