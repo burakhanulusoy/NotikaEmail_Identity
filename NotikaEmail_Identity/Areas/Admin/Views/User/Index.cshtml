@@ -1,0 +1,162 @@
+﻿@model List<ResultUserDto>
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    int count = 0;
+}
+
+
+
+
+<div class="main-content-container overflow-hidden">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4 mt-1">
+        <h3 class="mb-0">Users List</h3>
+
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb align-items-center mb-0 lh-1">
+                <li class="breadcrumb-item">
+                    <a href="index.html" class="d-flex align-items-center text-decoration-none">
+                        <i class="ri-home-8-line fs-15 text-primary me-1"></i>
+                        <span class="text-body fs-14 hover">Dashboard</span>
+                    </a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">
+                    <span>Kullanıcılar</span>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">
+                    <span class="text-secondary">Tüm Kullanıcılarımız</span>
+                </li>
+            </ol>
+        </nav>
+    </div>
+
+    <div class="card bg-white rounded-10 border border-white mb-4">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 p-20">
+            <form class="table-src-form position-relative m-0">
+                <input type="text" class="form-control w-350" placeholder="Search user...">
+                <div class="src-btn position-absolute top-50 start-0 translate-middle-y bg-transparent p-0 border-0">
+                    <span class="material-symbols-outlined">search</span>
+                </div>
+            </form>
+
+            <a href="create-user.html" class="text-primary fs-16 text-decoration-none">+ Add New User</a>
+        </div>
+
+        <div class="default-table-area mx-minus-1 table-contact-list">
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="fw-medium" style="width: 62px;">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="flexCheckDefault1">
+                                </div>
+                            </th>
+                            <th scope="col" class="fw-medium ps-0">#</th>
+                            <th scope="col" class="fw-medium">Kullanıcı Adı & Soyadı</th>
+                            <th scope="col" class="fw-medium">Email</th>
+                            <th scope="col" class="fw-medium">Rolü</th>
+                            <th scope="col" class="fw-medium">Hakkında</th>
+                            <th scope="col" class="fw-medium">Status</th>
+                            <th scope="col" class="fw-medium">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @foreach (var user in Model)
+                        {
+                            count++;
+                            <tr>
+                                <td class="text-body" style="width: 62px;">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="flexCheckDefault_@count">
+                                    </div>
+                                </td>
+
+                                <td class="text-body ps-0">@count</td>
+
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-shrink-0">
+                                            <img src="@(string.IsNullOrEmpty(user.ImageUrl) ? "/images/default-avatar.png" : user.ImageUrl)" class="rounded-circle" style="width: 35px; height: 35px;" alt="user-avatar">
+                                        </div>
+                                        <div class="flex-grow-1 ms-12">
+                                            <h4 class="fw-medium fs-16 mb-0">@(user.Name ?? "İsimsiz") @(user.Surname ?? "Kullanıcı")</h4>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td class="text-body">@(user.Email ?? "Email Yok")</td>
+
+                                <td class="text-body">
+                                    @(user.Roles != null && user.Roles.Any() ? string.Join(", ", user.Roles) : "Rol Atanmamış")
+                                </td>
+
+                                <td class="text-body">
+                                    @(user.Job ?? "Meslek Belirtilmedi") |
+                                    @(string.IsNullOrEmpty(user.AboutMe) ? "Hakkında bilgisi yok" : (user.AboutMe.Length > 20 ? user.AboutMe.Substring(0, 20) + "..." : user.AboutMe))
+                                </td>
+
+                                <td>
+                                    <span class="text-success bg-success bg-opacity-10 fs-15 fw-normal d-inline-block default-badge">Aktiflik Gelecek</span>
+                                </td>
+
+                                <td>
+                                    <div class="d-flex justify-content-end" style="gap: 12px;">
+                                        <a href="/Admin/User/AssignRole/@user.Id" class="bg-transparent p-0 border-0 hover-text-success" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Edit">
+                                            <i class="material-symbols-outlined fs-16 fw-normal text-primary">edit</i>
+                                        </a>
+                                        <a  class="bg-transparent p-0 border-0 hover-text-danger" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Delete">
+                                            <i class="material-symbols-outlined fs-16 fw-normal text-body">delete</i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+
+
+
+
+
+
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="d-flex justify-content-center justify-content-sm-between align-items-center text-center flex-wrap gap-2 showing-wrap pt-15 p-20">
+                <span class="fs-15">Showing 1 to 10 of 50 entries</span>
+
+                <nav class="custom-pagination" aria-label="Page navigation example">
+                    <ul class="pagination mb-0 justify-content-center">
+                        <li class="page-item">
+                            <button class="page-link icon" aria-label="Previous">
+                                <i class="material-symbols-outlined">west</i>
+                            </button>
+                        </li>
+                        <li class="page-item">
+                            <button class="page-link active">1</button>
+                        </li>
+                        <li class="page-item">
+                            <button class="page-link">2</button>
+                        </li>
+                        <li class="page-item">
+                            <button class="page-link">3</button>
+                        </li>
+                        <li class="page-item">
+                            <button class="page-link icon" aria-label="Next">
+                                <i class="material-symbols-outlined">east</i>
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
