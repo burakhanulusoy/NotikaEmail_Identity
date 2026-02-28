@@ -89,6 +89,14 @@ namespace NotikaEmail_Identity.Services.MessageServices
 
         }
 
+        public async Task<List<ResultMessageDto>> PeopleISentMessagesTo(int id)
+        {
+
+            var messages = await _messageRepository.PeopleISentMessagesTo(id);
+            return _mapper.Map<List<ResultMessageDto>>(messages);
+
+        }
+
         public async Task UpdateAsync(UpdateMessageDto dto)
         {
             var message=_mapper.Map<Message>(dto);

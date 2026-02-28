@@ -21,5 +21,9 @@ namespace NotikaEmail_Identity.Services.MessageServices
         Task<List<ResultMessageDto>> GetLast5DontReadMessageAsync(int id);
 
 
+        // burda sey yaptım kullancın kımlere mesaj attıgı sayfsaı ıın lzım oldu id senderId
+        Task<List<ResultMessageDto>> PeopleISentMessagesTo(int id);
+
+
     }
 }

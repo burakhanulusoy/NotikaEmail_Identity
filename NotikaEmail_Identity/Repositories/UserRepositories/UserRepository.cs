@@ -9,5 +9,7 @@ namespace NotikaEmail_Identity.Repositories.UserRepositories
         public UserRepository(AppDbContext appDbContext) : base(appDbContext)
         {
         }
+
+
     }
 }

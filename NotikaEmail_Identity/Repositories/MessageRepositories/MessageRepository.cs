@@ -79,5 +79,14 @@ namespace NotikaEmail_Identity.Repositories.MessageRepositories
             return messages;
 
         }
+
+        public async Task<List<Message>> PeopleISentMessagesTo(int id)
+        {
+            var messages = await _table.Where(x=>x.SenderId ==id).Include(x=>x.Receiver).Include(x=>x.Sender).AsNoTracking().ToListAsync();
+            var uniqueMessages = messages.DistinctBy(x => x.ReceiverId).ToList();
+
+            return uniqueMessages;
+
+        }
     }
 }

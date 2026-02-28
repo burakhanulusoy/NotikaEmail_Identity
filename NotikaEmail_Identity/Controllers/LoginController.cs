@@ -169,7 +169,112 @@ namespace NotikaEmail_Identity.Controllers
             return RedirectToAction("SignIn");
         }
 
+        // 1. KULLANICIYI FACEBOOK'A GÖNDEREN METOT
+        [HttpGet]
+        public IActionResult FacebookLogin()
+        {
+            // Facebook'tan dönüş yapacağı adresi belirliyoruz
+            string redirectUrl = Url.Action("FacebookResponse", "Login");
 
+            // Identity'nin Facebook için hazırladığı özellikleri alıyoruz
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties("Facebook", redirectUrl);
+
+            // Kullanıcıyı Facebook'un giriş ekranına fırlatıyoruz
+            return new ChallengeResult("Facebook", properties);
+        }
+
+        // 2. FACEBOOK'TAN DÖNÜŞTE KARŞILAYAN METOT
+        [HttpGet]
+        public async Task<IActionResult> FacebookResponse()
+        {
+            // Facebook'tan gelen kullanıcı bilgilerini (Email, Ad vb.) okuyoruz
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+
+            if (info == null)
+            {
+                return RedirectToAction("SignIn"); // Bir hata olduysa geri dön
+            }
+
+            // 1. İHTİMAL: Bu adam daha önce Facebook ile giriş yapmış mı?
+            var signInResult = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
+
+            if (signInResult.Succeeded)
+            {
+                // FACEBOOK İLE BAŞARILI GİRİŞ LOGU
+                _logger.LogInformation("Sistem İşlemi: Bir kullanıcı Facebook hesabı ile sisteme başarıyla giriş yaptı. ProviderKey: {Key}", info.ProviderKey);
+                return RedirectToAction("Inbox", "Default"); // Direkt içeri al
+            }
+
+            // 2. İHTİMAL: İlk defa Facebook ile geliyor! (Kayıt + Giriş)
+            if (!signInResult.Succeeded)
+            {
+                // Facebook'tan gerekli tüm bilgileri detaylıca çekiyoruz
+                string email = info.Principal.FindFirstValue(ClaimTypes.Email);
+                string firstName = info.Principal.FindFirstValue(ClaimTypes.GivenName);
+                string lastName = info.Principal.FindFirstValue(ClaimTypes.Surname);
+
+                // İsim veya soyisim boş gelirse diye güvenlik önlemi (Facebook bazen Name claim'inde ad+soyadı birleşik verir)
+                if (string.IsNullOrEmpty(firstName)) firstName = info.Principal.FindFirstValue(ClaimTypes.Name) ?? "Kullanıcı";
+                if (string.IsNullOrEmpty(lastName)) lastName = "";
+
+                // UFAK BİR KONTROL: Facebook bazen mail adresi vermeyebilir (kullanıcı telefonla kaydolmuşsa).
+                // Eğer mail null gelirse, ona sahte ama benzersiz bir mail atıyoruz ki sistemimiz çökmesin.
+                if (string.IsNullOrEmpty(email))
+                {
+                    email = info.ProviderKey + "@facebook.com";
+                }
+
+                if (email != null)
+                {
+                    // Mail adresinin @ işaretinden önceki kısmını Kullanıcı Adı (UserName) yapıyoruz
+                    string generatedUserName = email.Split('@')[0];
+
+                    // Veritabanımızda bu mailde biri var mı bakıyoruz
+                    var user = await _userManager.FindByEmailAsync(email);
+
+                    if (user == null)
+                    {
+                        // Yoksa arka planda ona otomatik, gerçek bilgileriyle ve şifresiz bir hesap açıyoruz!
+                        user = new AppUser
+                        {
+                            Email = email,
+                            UserName = generatedUserName,
+                            Name = firstName,
+                            Surname = lastName,
+                            EmailConfirmed = true,
+                            CreatedDate = DateTime.Now,
+                            PhoneNumber = "Belirtilmemiş",
+                            Job = "Belirtilmemiş",
+                            AboutMe = "Belirtilmemiş",
+                            City = "Belirtilmemiş",
+                            ActivationCode = 123456
+                        };
+
+                        var createResult = await _userManager.CreateAsync(user);
+                        if (createResult.Succeeded)
+                        {
+                            // Kullanıcıyı oluşturduk, şimdi Facebook hesabı ile eşleştiriyoruz
+                            await _userManager.AddLoginAsync(user, info);
+                        }
+                    }
+                    else
+                    {
+                        // Kullanıcı var ama daha önce Facebook bağlamamışsa, hesabını Facebook ile eşleştir
+                        await _userManager.AddLoginAsync(user, info);
+                    }
+
+                    // Son olarak adamı oturum açmış şekilde sisteme alıyoruz
+                    await _signInManager.SignInAsync(user, isPersistent: false);
+
+                    _logger.LogInformation("Sistem İşlemi: {UserEmail} adlı kullanıcı sisteme Facebook ile YENİ KAYIT oldu ve giriş yaptı.", email);
+
+                    return RedirectToAction("Inbox", "Default");
+                }
+            }
+
+            // Herhangi bir aksilikte SignIn'e geri fırlat
+            return RedirectToAction("SignIn");
+        }
 
 
 

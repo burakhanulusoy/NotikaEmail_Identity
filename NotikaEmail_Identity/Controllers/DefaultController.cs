@@ -2,12 +2,14 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using NotikaEmail_Identity.DTOs.MessageDtos;
 using NotikaEmail_Identity.Entities;
 using NotikaEmail_Identity.Models;
 using NotikaEmail_Identity.Services.CategoryServices;
 using NotikaEmail_Identity.Services.MessageServices;
 using PagedList.Core;
+using System.Threading.Tasks;
 
 namespace NotikaEmail_Identity.Controllers
 {
@@ -16,7 +18,8 @@ namespace NotikaEmail_Identity.Controllers
                                    UserManager<AppUser> _userManager,
                                    ICategoryService _categoryService,
                                    IWebHostEnvironment _hostEnvironment,
-                                   ILogger<DefaultController> _logger) : Controller
+                                   ILogger<DefaultController> _logger,
+                                   SignInManager<AppUser> signInManager) : Controller
     {
 
         public async Task<IActionResult> Inbox(int page = 1,int pageSize=2)
@@ -26,6 +29,16 @@ namespace NotikaEmail_Identity.Controllers
 
 
             var user = await _userManager.FindByNameAsync(User.Identity.Name);
+
+            if (user == null)
+            {
+                await signInManager.SignOutAsync();
+                return RedirectToAction("SignIn", "Login");
+            }
+
+
+
+
             var messages=await _messageService.GetAllFiterWithSenderAsync(x=>x.ReceiverId==user.Id);
 
             var values = new PagedList<ResultMessageDto>(messages.AsQueryable(),page, pageSize);
@@ -35,10 +48,17 @@ namespace NotikaEmail_Identity.Controllers
 
 
         
-        public async Task<IActionResult> SendBox(int page = 1 ,int pageSize = 2)
+        public async Task<IActionResult> SendBox(int page = 1 ,int pageSize = 12)
         {
 
             var user = await _userManager.FindByNameAsync(User.Identity.Name);
+
+            if (user == null)
+            {
+                await signInManager.SignOutAsync();
+                return RedirectToAction("SignIn", "Login");
+            }
+
             var messages = await _messageService.GetAllFiterWithSenderAsync(x => x.SenderId == user.Id);
 
             var values = new PagedList<ResultMessageDto>(messages.AsQueryable(), page, pageSize);
@@ -98,10 +118,19 @@ namespace NotikaEmail_Identity.Controllers
 
 
         
-        public async Task<IActionResult> SendMessage()
+        public async Task<IActionResult> SendMessage(string? email)
         {
            await  GetCategories();
-            return View();
+
+            var model = new SendMessageViewModel();
+
+         
+            if (!string.IsNullOrEmpty(email))
+            {
+                model.ReceiverEmail = email;
+            }
+
+            return View(model);
 
 
         }
@@ -221,6 +250,37 @@ namespace NotikaEmail_Identity.Controllers
 
             return File(fileBytes, "application/octet-stream", fileName);
         }
+
+
+
+        public async Task<IActionResult> PeopleISentMessagesTo()
+        {
+            var user = await _userManager.FindByNameAsync(User.Identity.Name);
+
+            ViewBag.name = user.Name + " " + user.Surname;
+            ViewBag.job = user.Job;
+            ViewBag.image = user.ImageUrl;
+
+            var messagesTo = await _messageService.PeopleISentMessagesTo(user.Id);
+
+            return View(messagesTo);
+        }
+
+
+
+
+
+        public async Task<IActionResult> Logout()
+        {
+
+            await signInManager.SignOutAsync();
+            return RedirectToAction("SignIn","Login");
+
+
+        }
+
+
+
 
 
     }

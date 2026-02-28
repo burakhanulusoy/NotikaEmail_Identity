@@ -22,6 +22,8 @@ namespace NotikaEmail_Identity.Repositories.MessageRepositories
         //okunmyan son 5 mesajı getir
         Task<List<Message>> GetLast5DontReadMessageAsync(int id);
 
+        // burda sey yaptım kullancın kımlere mesaj attıgı sayfsaı ıın lzım oldu id senderId
+        Task<List<Message>> PeopleISentMessagesTo(int id);
 
 
 

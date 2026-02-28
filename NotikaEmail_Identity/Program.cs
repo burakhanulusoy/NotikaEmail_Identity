@@ -76,6 +76,12 @@ builder.Services.AddAuthentication()
             context.Response.Redirect(context.RedirectUri + "&prompt=consent");
             return Task.CompletedTask;
         };
+    })
+    .AddFacebook(options =>
+    {
+        options.AppId = builder.Configuration["Authentication:Facebook:AppId"];
+        options.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"];
+
     });
 
 

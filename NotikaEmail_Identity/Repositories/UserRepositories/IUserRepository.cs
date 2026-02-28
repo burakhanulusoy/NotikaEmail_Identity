@@ -5,5 +5,7 @@ namespace NotikaEmail_Identity.Repositories.UserRepositories
 {
     public interface IUserRepository:IGenericRepository<AppUser>
     {
+
+
     }
 }
