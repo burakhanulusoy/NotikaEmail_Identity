@@ -117,6 +117,8 @@ builder.Services.AddScoped<ISendEmail, SendEmail>();
 
 builder.Services.AddScoped<SeqLogService>();
 
+builder.Services.AddHttpClient();
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
@@ -159,6 +161,5 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
-
 
 app.Run();

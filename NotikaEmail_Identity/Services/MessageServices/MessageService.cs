@@ -105,6 +105,14 @@ namespace NotikaEmail_Identity.Services.MessageServices
 
         }
 
+        public async Task<ResultMessageDto> GetMessageUserSendDateAsync(int id)
+        {
+
+            var message = await _messageRepository.GetMessageUserSendDateAsync(id);
+            return _mapper.Map<ResultMessageDto>(message);
+
+        }
+
         public async Task<List<ResultMessageDto>> PeopleISentMessagesTo(int id)
         {
 

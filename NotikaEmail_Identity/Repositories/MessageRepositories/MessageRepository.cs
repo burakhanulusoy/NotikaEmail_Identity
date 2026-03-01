@@ -106,6 +106,18 @@ namespace NotikaEmail_Identity.Repositories.MessageRepositories
 
         }
 
+        public async Task<Message> GetMessageUserSendDateAsync(int id)
+        {
+            
+
+            var message = await _table.Where(x=>x.SenderId==id).Include(x=>x.Sender).OrderByDescending(x=>x.Id).FirstOrDefaultAsync();
+            return message;
+
+
+
+
+        }
+
         public async Task<List<Message>> PeopleISentMessagesTo(int id)
         {
             var messages = await _table.Where(x=>x.SenderId ==id).Include(x=>x.Receiver).Include(x=>x.Sender).AsNoTracking().ToListAsync();

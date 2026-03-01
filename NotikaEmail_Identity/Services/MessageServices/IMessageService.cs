@@ -30,6 +30,7 @@ namespace NotikaEmail_Identity.Services.MessageServices
 
         Task<List<ResultMessageDto>> GetMessagesByCategoryId(int id,int userId);
 
+        Task<ResultMessageDto> GetMessageUserSendDateAsync(int id);
 
 
     }

@@ -33,6 +33,10 @@ namespace NotikaEmail_Identity.Repositories.MessageRepositories
         //category id sine göre getirmek 
         Task<List<Message>> GetMessagesByCategoryId(int id,int userId);
 
+        //kullancı en son ne zamn mail attı
+
+        Task<Message> GetMessageUserSendDateAsync(int id);
+
 
 
     }
