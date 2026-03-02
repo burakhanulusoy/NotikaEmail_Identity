@@ -2,10 +2,13 @@ using Core_IyzicoPaymentSystem.Models;
 using Core_IyzicoPaymentSystem.Repositories.OrderRepositories;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using NotikaEmail_Identity.Context;
 using NotikaEmail_Identity.Entities;
 using NotikaEmail_Identity.Mappings;
+using NotikaEmail_Identity.Models.JwtViewModels;
 using NotikaEmail_Identity.Repositories.CategoryRepositories;
 using NotikaEmail_Identity.Repositories.MessageRepositories;
 using NotikaEmail_Identity.Repositories.UserRepositories;
@@ -15,6 +18,7 @@ using NotikaEmail_Identity.Services.SendEmailServices;
 using NotikaEmail_Identity.Services.UserServices;
 using NotikaEmail_Identity.Validations;
 using Serilog;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -87,6 +91,30 @@ builder.Services.AddAuthentication()
     });
 
 
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+
+
+}).AddJwtBearer(opt =>
+{
+    var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettingsModel>();
+
+    opt.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    {
+
+        ValidateIssuer = true,//kim üretti
+        ValidateAudience = true,//kim kullanabilir
+        ValidateLifetime = true,//token siresi doldumu
+        ValidateIssuerSigningKey = true,//biz mi ürettik tokeni
+        ValidIssuer = jwtSettings.Issuer,
+        ValidAudience = jwtSettings.Audience,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key))//gizli anhtar token dogrulamýýýcn
+
+    };
+
+});
 
 
 
@@ -118,6 +146,10 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ISendEmail, SendEmail>();
 
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+
+
+builder.Services.Configure<JwtSettingsModel>(builder.Configuration.GetSection("JwtSettings"));
+
 
 builder.Services.Configure<IyzicoSettings>(
     builder.Configuration.GetSection("IyzicoSettings")

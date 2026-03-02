@@ -54,10 +54,6 @@ namespace NotikaEmail_Identity.Areas.Admin.Controllers
                     RoleName = role.Name,
                     UserId = user.Id,
                     RoleExists = userRoles.Contains(role.Name)
-
-
-
-
                 });
 
 

@@ -1,0 +1,81 @@
+﻿@using NotikaEmail_Identity.Models.JwtViewModels
+@model SimpleUserViewModel
+
+
+@{
+    ViewData["Title"] = "Generate";
+    Layout = null;
+}
+
+
+<h2>Token Uret</h2>
+
+
+<p>Parmetre gir ve tokenına al</p>
+
+
+<form method="post">
+
+
+
+
+
+    <label>ad</label>
+    <input asp-for="Name" type="text" required class="form-control" />
+
+    <br />
+
+
+    <label>soyad</label>
+    <input asp-for="Surname" type="text" required class="form-control" />
+
+    <br />
+    <label>sehir</label>
+    <input asp-for="City" type="text" required class="form-control" />
+
+    <br />
+    <label>usernama</label>
+    <input asp-for="UserName" type="text" required class="form-control" />
+
+    <br />
+   
+    <button class="btn btn-danger">Token Olustır</button>
+
+
+
+    @if (Model != null && !string.IsNullOrEmpty(Model.Token))
+    {
+        <div class="alert alert-success mt-3">
+            <strong>Token: </strong>
+            <br />
+            <textarea rows="5" class="form-control">@Model.Token</textarea>
+        </div>
+    }
+
+
+
+
+
+
+</form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
