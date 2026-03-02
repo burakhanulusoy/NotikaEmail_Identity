@@ -14,7 +14,8 @@ using System.Text.Json;
 
 namespace NotikaEmail_Identity.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin, User")]
+
     public class PaymentController(IOptions<IyzicoSettings> options,
                                    IOrderRepository _orderRepository,
                                    UserManager<AppUser> _userManager,

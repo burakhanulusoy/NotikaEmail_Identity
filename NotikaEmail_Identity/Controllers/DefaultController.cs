@@ -11,7 +11,8 @@ using PagedList.Core;
 
 namespace NotikaEmail_Identity.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin, User")]
+
     public class DefaultController(IMessageService _messageService,
                                    UserManager<AppUser> _userManager,
                                    ICategoryService _categoryService,

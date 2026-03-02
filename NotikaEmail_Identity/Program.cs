@@ -3,6 +3,7 @@ using Core_IyzicoPaymentSystem.Repositories.OrderRepositories;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NotikaEmail_Identity.Context;
@@ -59,12 +60,14 @@ builder.Services.AddIdentity<AppUser, AppRole>(config =>
 
 
 }).AddEntityFrameworkStores<AppDbContext>()
-  .AddErrorDescriber<CustomErrorDescriber>();
+  .AddErrorDescriber<CustomErrorDescriber>().AddTokenProvider<DataProtectorTokenProvider<AppUser>>(TokenOptions.DefaultProvider);
 //fromstores idedntiy ile veritabaný iliþki haberleþmesýný saðlýyor...
 
 builder.Services.ConfigureApplicationCookie(opt =>
 {
-    opt.LoginPath = "/Login/SignIn";
+    opt.LoginPath = "/Login/SignIn";//401 abi
+
+    opt.AccessDeniedPath = "/NotComponent/Index";//403
 
 });
 
@@ -91,30 +94,30 @@ builder.Services.AddAuthentication()
     });
 
 
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+//builder.Services.AddAuthentication(options =>
+//{
+//    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+//    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 
 
-}).AddJwtBearer(opt =>
-{
-    var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettingsModel>();
+//}).AddJwtBearer(opt =>
+//{
+//    var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettingsModel>();
 
-    opt.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-    {
+//    opt.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+//    {
 
-        ValidateIssuer = true,//kim üretti
-        ValidateAudience = true,//kim kullanabilir
-        ValidateLifetime = true,//token siresi doldumu
-        ValidateIssuerSigningKey = true,//biz mi ürettik tokeni
-        ValidIssuer = jwtSettings.Issuer,
-        ValidAudience = jwtSettings.Audience,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key))//gizli anhtar token dogrulamýýýcn
+//        ValidateIssuer = true,//kim üretti
+//        ValidateAudience = true,//kim kullanabilir
+//        ValidateLifetime = true,//token siresi doldumu
+//        ValidateIssuerSigningKey = true,//biz mi ürettik tokeni
+//        ValidIssuer = jwtSettings.Issuer,
+//        ValidAudience = jwtSettings.Audience,
+//        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key))//gizli anhtar token dogrulamýýýcn
 
-    };
+//    };
 
-});
+//});
 
 
 
@@ -182,6 +185,9 @@ app.UseHttpsRedirection();
 // identity ile ilgiis yok direk .net security 
 //
 app.UseStatusCodePagesWithReExecute("/PageNotFound/Index", "?code={0}");
+
+
+
 app.UseRouting();
 
 // Bunu ekle: Gelen HTTP isteklerini Seq'e çok þýk ve tek satýrda loglar!

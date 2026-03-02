@@ -69,6 +69,7 @@ namespace NotikaEmail_Identity.Controllers
             // BAŞARILI İŞLEM LOGU (İşte asıl görmek istediğimiz mavi/yeşil log)
             _logger.LogInformation("Sistem İşlemi: {UserEmail} adlı kullanıcı e-posta adresini başarıyla doğruladı ve hesabını aktifleştirdi.", email);
 
+            await _userManager.AddToRoleAsync(user, "User");
 
             return RedirectToAction("SignIn", "Login");
 

@@ -8,7 +8,8 @@ using NotikaEmail_Identity.Services.UserServices;
 
 namespace NotikaEmail_Identity.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin, User")]
+
     public class ProfileController(UserManager<AppUser> _userManager,
         IUserService _userService,
         SignInManager<AppUser> _signInManager,

@@ -7,10 +7,9 @@ using System.Text;
 using System.Text.Json;
 
 namespace NotikaEmail_Identity.Controllers
-    {
-
-    [Authorize]
-        public class CloudeAiController(IConfiguration _configuration
+{
+    [Authorize(Roles = "Admin, User")]
+    public class CloudeAiController(IConfiguration _configuration
                                        , IHttpClientFactory _httpClientFactory
                                        ,UserManager<AppUser> _userManager
                                        ,IMessageService  _messageService ) : Controller

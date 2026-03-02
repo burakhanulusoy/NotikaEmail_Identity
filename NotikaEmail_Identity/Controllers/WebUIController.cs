@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace NotikaEmail_Identity.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin, User")]
     public class WebUIController : Controller
     {
         public IActionResult Index()

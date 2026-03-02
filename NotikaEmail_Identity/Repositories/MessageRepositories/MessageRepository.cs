@@ -74,7 +74,7 @@ namespace NotikaEmail_Identity.Repositories.MessageRepositories
 
         public async Task<int> GetDontReadMessageCountAsync(int id)
         {
-             var count= await _table.Where(x=>x.ReceiverId == id && x.IsRead == false).CountAsync();
+             var count= await _table.Where(x=>x.ReceiverId == id && x.IsRead == false &&x.IsDeleted==false).CountAsync();
             
              return count;
 

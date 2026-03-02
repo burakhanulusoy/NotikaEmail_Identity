@@ -75,6 +75,7 @@ namespace NotikaEmail_Identity.Controllers
             _logger.LogInformation("Sistem İşlemi: Yeni bir kullanıcı başarıyla sisteme kayıt oldu. Kullanıcı: {UserName} ({UserEmail}). Aktivasyon kodu gönderiliyor.",
                 user.UserName, user.Email);
 
+            await _userManger.AddToRoleAsync(user, "User");
 
             try
             {
