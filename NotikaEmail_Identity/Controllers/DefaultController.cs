@@ -2,14 +2,12 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using NotikaEmail_Identity.DTOs.MessageDtos;
 using NotikaEmail_Identity.Entities;
 using NotikaEmail_Identity.Models;
 using NotikaEmail_Identity.Services.CategoryServices;
 using NotikaEmail_Identity.Services.MessageServices;
 using PagedList.Core;
-using System.Threading.Tasks;
 
 namespace NotikaEmail_Identity.Controllers
 {
@@ -76,7 +74,7 @@ namespace NotikaEmail_Identity.Controllers
                 messageToUpdate.IsRead = true;
                 await _messageService.UpdateAsync(messageToUpdate);
                 // MESAJ OKUNDU LOGU (Sadece ilk defa okunduğunda log atarız, gereksiz kalabalık olmasın)
-                _logger.LogInformation("Bilgi: {MessageId} ID'li mesaj ilk kez okundu olarak işaretlendi.", id);
+                _logger.LogInformation("Bilgi: {MessageId} ID'li mesaj  okundu olarak işaretlendi.", id);
             }
 
             var message = await _messageService.GetByIdWithReceiverAsync(id);

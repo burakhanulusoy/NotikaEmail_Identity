@@ -1,3 +1,5 @@
+using Core_IyzicoPaymentSystem.Models;
+using Core_IyzicoPaymentSystem.Repositories.OrderRepositories;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
@@ -114,6 +116,15 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddScoped<ISendEmail, SendEmail>();
+
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+
+builder.Services.Configure<IyzicoSettings>(
+    builder.Configuration.GetSection("IyzicoSettings")
+
+    );
+
+
 
 builder.Services.AddScoped<SeqLogService>();
 

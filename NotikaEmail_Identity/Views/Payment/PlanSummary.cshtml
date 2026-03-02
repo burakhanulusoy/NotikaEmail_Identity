@@ -1,0 +1,307 @@
+﻿@{
+    Layout = null;
+}
+
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Notika Premium'a Yükselt</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec5b",
+                        "primary-dark": "#0ea641",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#102216",
+                        "neutral-light": "#e7f3eb",
+                        "neutral-dark": "#1a2f23",
+                        "text-main": "#0d1b12",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-text-main antialiased selection:bg-primary selection:text-black">
+    <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+        <div class="w-full border-b border-neutral-light bg-white/80 backdrop-blur-md sticky top-0 z-50">
+            <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center gap-2 text-text-main">
+                    <div class="flex size-8 items-center justify-center rounded-lg bg-primary/20 text-primary">
+                        <span class="material-symbols-outlined text-2xl">mail</span>
+                    </div>
+                    <span class="text-xl font-bold tracking-tight">Notika</span>
+                </div>
+                <div class="hidden items-center gap-8 md:flex">
+                    <nav class="flex gap-6">
+                        <a class="text-sm font-medium hover:text-primary transition-colors" href="#">Gelen Kutusu</a>
+                        <a class="text-sm font-medium hover:text-primary transition-colors" href="#">Özellikler</a>
+                        <a class="text-sm font-medium hover:text-primary transition-colors" href="#">Destek</a>
+                        <a class="text-sm font-medium hover:text-primary transition-colors" href="#">Fiyatlandırma</a>
+                    </nav>
+                </div>
+                <div class="flex items-center gap-4">
+                    <a class="hidden text-sm font-medium hover:text-primary sm:block" href="/Default/Index">Ana Sayfaya Dön</a>
+                    <a href="/Payment/Index" class="flex h-9 cursor-pointer items-center justify-center rounded-lg bg-primary px-4 text-sm font-bold text-black transition-transform hover:scale-105 active:scale-95 shadow-lg shadow-primary/20">
+                        Hemen Yükselt
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <main class="flex-grow">
+            <section class="relative overflow-hidden py-16 sm:py-24">
+                <div class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent"></div>
+                <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
+                    <div class="grid gap-12 lg:grid-cols-2 lg:gap-8 items-center">
+                        <div class="flex flex-col gap-6 text-center lg:text-left">
+                            <div class="inline-flex w-fit items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-semibold text-primary-dark mx-auto lg:mx-0">
+                                <span class="relative flex h-2 w-2">
+                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                                </span>
+                                Yeni Yapay Zeka Özellikleri Yayında!
+                            </div>
+                            <h1 class="text-4xl font-black leading-tight tracking-tight sm:text-5xl lg:text-6xl text-text-main">
+                                <span class="text-primary">Notika Premium'a</span> Yükselt
+                            </h1>
+                            <p class="text-lg text-gray-600 max-w-2xl mx-auto lg:mx-0">
+                                Daha temiz, daha hızlı ve çok daha akıllı bir gelen kutusu deneyimi yaşa. Verimliliğini artırmak ve tüm iletişimini güvence altına almak için tasarlanmış özel Pro özelliklerin kilidini hemen aç.
+                            </p>
+                            <div class="flex flex-col items-center gap-4 sm:flex-row sm:justify-center lg:justify-start">
+                                <button class="h-12 w-full sm:w-auto rounded-xl bg-primary px-8 text-base font-bold text-black shadow-lg shadow-primary/25 transition-all hover:bg-primary-dark hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 active:shadow-sm">
+                                    14 Günlük Ücretsiz Deneme
+                                </button>
+                                <button class="group flex h-12 w-full sm:w-auto items-center justify-center gap-2 rounded-xl bg-white px-8 text-base font-bold text-text-main border border-neutral-200 hover:border-primary/50 hover:bg-neutral-50 transition-all">
+                                    <span>Planları İncele</span>
+                                    <span class="material-symbols-outlined text-lg transition-transform group-hover:translate-x-1">arrow_forward</span>
+                                </button>
+                            </div>
+                            <p class="text-xs text-gray-500 font-medium">Deneme için kredi kartı gerekmez • İstediğin zaman iptal edebilirsin</p>
+                        </div>
+                        <div class="relative mx-auto w-full max-w-[600px] lg:max-w-none">
+                            <div class="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-gradient-to-br from-neutral-100 to-white shadow-2xl border border-neutral-200/50">
+                                <div class="absolute inset-4 rounded-xl bg-white shadow-inner flex flex-col overflow-hidden">
+                                    <div class="h-12 border-b flex items-center px-4 bg-gray-50/50">
+                                        <div class="flex gap-2">
+                                            <div class="w-3 h-3 rounded-full bg-red-400"></div>
+                                            <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+                                            <div class="w-3 h-3 rounded-full bg-green-400"></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex-1 p-6 flex gap-6">
+                                        <div class="w-1/4 space-y-3 hidden sm:block">
+                                            <div class="h-8 w-full bg-primary/10 rounded-lg"></div>
+                                            <div class="h-4 w-3/4 bg-gray-100 rounded"></div>
+                                            <div class="h-4 w-1/2 bg-gray-100 rounded"></div>
+                                        </div>
+                                        <div class="flex-1 space-y-4">
+                                            <div class="h-24 w-full bg-gradient-to-r from-primary/5 to-transparent rounded-xl border border-primary/10 p-4 relative overflow-hidden group">
+                                                <div class="absolute top-2 right-2 text-primary opacity-50"><span class="material-symbols-outlined">auto_awesome</span></div>
+                                                <div class="h-4 w-1/3 bg-primary/20 rounded mb-2"></div>
+                                                <div class="h-3 w-full bg-gray-100 rounded"></div>
+                                            </div>
+                                            <div class="h-20 w-full bg-white border border-gray-100 rounded-xl shadow-sm p-4">
+                                                <div class="h-4 w-1/4 bg-gray-200 rounded mb-2"></div>
+                                                <div class="h-3 w-3/4 bg-gray-100 rounded"></div>
+                                            </div>
+                                            <div class="h-20 w-full bg-white border border-gray-100 rounded-xl shadow-sm p-4">
+                                                <div class="h-4 w-1/4 bg-gray-200 rounded mb-2"></div>
+                                                <div class="h-3 w-3/4 bg-gray-100 rounded"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="absolute -right-4 top-1/2 -translate-y-1/2 rounded-lg bg-white p-3 shadow-xl ring-1 ring-black/5 animate-bounce duration-[3000ms]">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 text-green-600">
+                                            <span class="material-symbols-outlined">shield</span>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-bold text-gray-900">%100 Güvenli</p>
+                                            <p class="text-xs text-gray-500">Uçtan uca şifreleme</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="bg-white py-16 sm:py-24">
+                <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    <div class="mb-12 text-center">
+                        <h2 class="text-3xl font-black tracking-tight text-text-main sm:text-4xl">Premium Avantajları</h2>
+                        <p class="mt-4 text-lg text-gray-600">Bu güçlü araçlarla Notika gelen kutunun tam potansiyelini ortaya çıkar.</p>
+                    </div>
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                        <div class="group relative overflow-hidden rounded-2xl border border-neutral-light bg-background-light p-6 transition-all hover:border-primary/50 hover:shadow-lg hover:-translate-y-1">
+                            <div class="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-white text-primary shadow-sm ring-1 ring-neutral-200">
+                                <span class="material-symbols-outlined text-3xl">cloud</span>
+                            </div>
+                            <h3 class="mb-2 text-xl font-bold text-text-main">1TB Depolama</h3>
+                            <p class="text-sm leading-relaxed text-gray-600">Asla yerin bitmesin. Binlerce önemli e-postayı, yüksek çözünürlüklü fotoğrafları ve büyük ekleri güvenle sakla.</p>
+                            <div class="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-primary/5 blur-2xl transition-all group-hover:bg-primary/10"></div>
+                        </div>
+                        <div class="group relative overflow-hidden rounded-2xl border border-neutral-light bg-background-light p-6 transition-all hover:border-primary/50 hover:shadow-lg hover:-translate-y-1">
+                            <div class="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-white text-primary shadow-sm ring-1 ring-neutral-200">
+                                <span class="material-symbols-outlined text-3xl">block</span>
+                            </div>
+                            <h3 class="mb-2 text-xl font-bold text-text-main">Reklamsız Deneyim</h3>
+                            <p class="text-sm leading-relaxed text-gray-600">Çalışma alanını veya okuma panelini darmadağın eden dikkat dağıtıcı reklamlar olmadan sadece önemli olana odaklan.</p>
+                            <div class="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-primary/5 blur-2xl transition-all group-hover:bg-primary/10"></div>
+                        </div>
+                        <div class="group relative overflow-hidden rounded-2xl border border-neutral-light bg-background-light p-6 transition-all hover:border-primary/50 hover:shadow-lg hover:-translate-y-1">
+                            <div class="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-white text-primary shadow-sm ring-1 ring-neutral-200">
+                                <span class="material-symbols-outlined text-3xl">support_agent</span>
+                            </div>
+                            <h3 class="mb-2 text-xl font-bold text-text-main">Öncelikli Destek</h3>
+                            <p class="text-sm leading-relaxed text-gray-600">Sıra bekleme. 7/24 özel premium destek hattımızla sorularına anında yanıt al ve işine hız kesmeden devam et.</p>
+                            <div class="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-primary/5 blur-2xl transition-all group-hover:bg-primary/10"></div>
+                        </div>
+                        <div class="group relative overflow-hidden rounded-2xl border border-neutral-light bg-background-light p-6 transition-all hover:border-primary/50 hover:shadow-lg hover:-translate-y-1">
+                            <div class="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-white text-primary shadow-sm ring-1 ring-neutral-200">
+                                <span class="material-symbols-outlined text-3xl">auto_awesome</span>
+                            </div>
+                            <h3 class="mb-2 text-xl font-bold text-text-main">Yapay Zeka Akıllı Filtreler</h3>
+                            <p class="text-sm leading-relaxed text-gray-600">Akıllı algoritmalar e-postalarını otomatik olarak sıralar, acil olanları vurgular ve gereksiz gürültüyü filtreler.</p>
+                            <div class="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-primary/5 blur-2xl transition-all group-hover:bg-primary/10"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="py-16 sm:py-24 bg-background-light relative">
+                <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-neutral-300 to-transparent"></div>
+                <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+                    <div class="grid gap-8 md:grid-cols-2 lg:gap-12 items-start">
+                        <div class="flex flex-col rounded-3xl border border-neutral-200 bg-white p-8 shadow-sm transition-shadow hover:shadow-md">
+                            <div class="mb-6">
+                                <h3 class="text-lg font-bold text-gray-500 uppercase tracking-wider">Ücretsiz</h3>
+                                <div class="mt-4 flex items-baseline gap-1">
+                                    <span class="text-5xl font-black text-text-main">₺0</span>
+                                    <span class="text-lg font-medium text-gray-500">/ay</span>
+                                </div>
+                                <p class="mt-2 text-sm text-gray-500">Kişisel kullanım ve temel ihtiyaçlar için.</p>
+                            </div>
+                            <button class="mb-8 w-full rounded-xl border border-neutral-200 bg-neutral-50 py-3 text-sm font-bold text-text-main transition-colors hover:bg-neutral-100 cursor-default">
+                                Mevcut Planın
+                            </button>
+                            <ul class="flex flex-col gap-4 text-sm text-gray-700">
+                                <li class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-green-600 text-[20px]">check_circle</span>
+                                    15GB Depolama
+                                </li>
+                                <li class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-green-600 text-[20px]">check_circle</span>
+                                    Temel Spam Koruması
+                                </li>
+                                <li class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-green-600 text-[20px]">check_circle</span>
+                                    Standart E-posta Desteği
+                                </li>
+                                <li class="flex items-center gap-3 text-gray-400">
+                                    <span class="material-symbols-outlined text-[20px]">cancel</span>
+                                    Özel Alan Adı (Domain) Yok
+                                </li>
+                                <li class="flex items-center gap-3 text-gray-400">
+                                    <span class="material-symbols-outlined text-[20px]">cancel</span>
+                                    Reklam İçerir
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="relative flex flex-col rounded-3xl border-2 border-primary bg-white p-8 shadow-2xl shadow-primary/10">
+                            <div class="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-primary px-4 py-1 text-xs font-bold uppercase tracking-wide text-black shadow-sm">
+                                En İyi Fırsat
+                            </div>
+                            <div class="mb-6">
+                                <h3 class="text-lg font-bold text-primary-dark uppercase tracking-wider">Premium</h3>
+                                <div class="mt-4 flex items-baseline gap-1">
+                                    <span class="text-5xl font-black text-text-main">₺1250,00</span>
+                                    <span class="text-lg font-medium text-gray-500">/ay</span>
+                                </div>
+                                <p class="mt-2 text-sm text-gray-500">Ciddi bir üretkenlik için ihtiyacın olan her şey.</p>
+                            </div>
+                            <a href="/Payment/Index" class="mb-8 flex w-full items-center justify-center rounded-xl bg-primary py-3 text-sm font-bold text-black shadow-lg shadow-primary/25 transition-transform hover:scale-[1.02] active:scale-[0.98]">
+                                Hemen Yükselt
+                            </a>
+                            <ul class="flex flex-col gap-4 text-sm text-gray-700">
+                                <li class="flex items-center gap-3 font-medium">
+                                    <span class="material-symbols-outlined text-primary text-[20px]">check_circle</span>
+                                    1TB Sınırsız Depolama
+                                </li>
+                                <li class="flex items-center gap-3 font-medium">
+                                    <span class="material-symbols-outlined text-primary text-[20px]">check_circle</span>
+                                    Gelişmiş Yapay Zeka Filtreleme
+                                </li>
+                                <li class="flex items-center gap-3 font-medium">
+                                    <span class="material-symbols-outlined text-primary text-[20px]">check_circle</span>
+                                    7/24 Öncelikli Müşteri Desteği
+                                </li>
+                                <li class="flex items-center gap-3 font-medium">
+                                    <span class="material-symbols-outlined text-primary text-[20px]">check_circle</span>
+                                    %100 Reklamsız Deneyim
+                                </li>
+                                <li class="flex items-center gap-3 font-medium">
+                                    <span class="material-symbols-outlined text-primary text-[20px]">check_circle</span>
+                                    Özel E-posta Alan Adları
+                                </li>
+                                <li class="flex items-center gap-3 font-medium">
+                                    <span class="material-symbols-outlined text-primary text-[20px]">check_circle</span>
+                                    Gelişmiş Güvenlik Paketi
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="mt-12 text-center">
+                        <p class="text-sm text-gray-500">
+                            Tüm ekibin için ortak bir plana mı ihtiyacın var? <a class="font-medium text-primary hover:underline" href="#">Notika Business'a göz at</a>.
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="border-t border-neutral-light bg-white py-12">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col items-center justify-between gap-6 md:flex-row">
+                    <div class="flex items-center gap-2 text-text-main">
+                        <div class="flex size-6 items-center justify-center rounded bg-primary/20 text-primary">
+                            <span class="material-symbols-outlined text-sm">mail</span>
+                        </div>
+                        <span class="font-bold tracking-tight">Notika</span>
+                    </div>
+                    <div class="flex flex-wrap justify-center gap-8 text-sm text-gray-600">
+                        <a class="hover:text-primary transition-colors" href="#">Gizlilik Politikası</a>
+                        <a class="hover:text-primary transition-colors" href="#">Hizmet Şartları</a>
+                        <a class="hover:text-primary transition-colors" href="#">Bize Ulaşın</a>
+                        <a class="hover:text-primary transition-colors" href="#">Yardım Merkezi</a>
+                    </div>
+                    <p class="text-sm text-gray-400">© 2026 Notika A.Ş. Tüm hakları saklıdır.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

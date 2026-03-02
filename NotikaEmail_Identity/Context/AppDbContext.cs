@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Core_IyzicoPaymentSystem.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using NotikaEmail_Identity.Entities;
 
@@ -46,6 +47,9 @@ namespace NotikaEmail_Identity.Context
 
         public DbSet<Message> Messages { get; set; }
         public DbSet<Category> Categories { get; set; }
+
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderLine> OrderLines { get; set; }
 
 
 
