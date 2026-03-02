@@ -160,6 +160,7 @@ namespace NotikaEmail_Identity.Controllers
 
                     _logger.LogInformation("Sistem İşlemi: {UserEmail} adlı kullanıcı sisteme Google ile YENİ KAYIT oldu ve giriş yaptı.", email);
 
+                    await _userManager.AddToRoleAsync(user, "User");
 
                     return RedirectToAction("Inbox", "Default");
                 }
@@ -268,6 +269,7 @@ namespace NotikaEmail_Identity.Controllers
 
                     _logger.LogInformation("Sistem İşlemi: {UserEmail} adlı kullanıcı sisteme Facebook ile YENİ KAYIT oldu ve giriş yaptı.", email);
 
+                    await _userManager.AddToRoleAsync(user, "User");
                     return RedirectToAction("Inbox", "Default");
                 }
             }

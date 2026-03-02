@@ -143,7 +143,7 @@
                     </div>
 
                     <div class="email-card-body">
-                        <form method="post" enctype="multipart/form-data">
+                        <form method="post" enctype="multipart/form-data" id="messageForm">
 
                             <div class="row">
                                 <div class="col-lg-6 col-md-6 col-sm-12">
@@ -196,9 +196,15 @@
                                     </span>
                                 </div>
 
-                                <button type="submit" class="btn btn-send waves-effect">
-                                    Mesajı Gönder <i class="notika-icon notika-right-arrow"></i>
-                                </button>
+                                <div class="d-flex" style="gap: 10px;">
+                                    <button type="button" id="btnCancel" class="btn btn-danger waves-effect" style="border-radius: 25px; padding: 12px 30px; font-weight: 600;">
+                                        <i class="notika-icon notika-close"></i> Vazgeç
+                                    </button>
+
+                                    <button type="submit" class="btn btn-send waves-effect">
+                                        Mesajı Gönder <i class="notika-icon notika-right-arrow"></i>
+                                    </button>
+                                </div>
 
                             </div>
 
@@ -226,12 +232,67 @@
         }
     }
 </script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+<script>
+    $(document).ready(function () {
 
+        $('#btnCancel').on('click', function (e) {
+            e.preventDefault();
 
+            var receiver = $('#ReceiverEmail').val();
+            var subject = $('#Subject').val();
+            var content = $('#MessageDetail').val();
 
+            if (receiver !== "" || subject !== "" || content !== "") {
+                Swal.fire({
+                    title: 'Sayfadan ayrılıyorsunuz!',
+                    text: "Yazdıklarınızı taslak olarak kaydetmek ister misiniz?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#00c292',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Evet, Taslaklara Kaydet',
+                    cancelButtonText: 'İptal, Sayfada Kal' // <-- METNİ GÜNCELLEDİK
+                }).then((result) => {
+                    if (result.isConfirmed) {
 
+                        var formElement = document.getElementById('messageForm');
+                        var formData = new FormData(formElement);
 
+                        $.ajax({
+                            url: '/Default/SaveDraftMessage',
+                            type: 'POST',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            success: function (response) {
+                                if (response.success) {
+                                    Swal.fire('Kaydedildi!', 'Mesajınız taslaklara eklendi.', 'success')
+                                        .then(() => {
+                                            window.location.href = '/Default/Inbox';
+                                        });
+                                }
+                            },
+                            error: function () {
+                                Swal.fire('Hata!', 'Taslak kaydedilirken bir sorun oluştu.', 'error');
+                            }
+                        });
+                    }
+                    // DİKKAT: Buradaki "else" bloğunu tamamen SİLDİK.
+                    // Artık İptal dendiğinde hiçbir şey olmayacak, ekranda kalacak!
+                });
+            } else {
+                // Eğer form BOŞSA ve vazgeçe basarsa, onu sormadan Gelen Kutusuna atsın mı?
+                // Yoksa burada da mı hiçbir şey yapmasın? Şimdilik Gelen Kutusuna atsın diye bıraktım.
+                // Eğer boşken de basınca hiçbir şey yapmasın diyorsan aşağıdaki satırı silebilirsin.
+                window.location.href = '/Default/Inbox';
+            }
+        });
+
+    });
+</script>
 
 
 

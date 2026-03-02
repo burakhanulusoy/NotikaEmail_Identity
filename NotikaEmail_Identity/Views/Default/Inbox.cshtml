@@ -220,9 +220,9 @@
                                             </td>
 
                                             <td style="width: 50px; text-align: center; vertical-align: middle; padding: 15px 10px;">
-                                                @if (!message.IsRead)
+                                                @if (!string.IsNullOrEmpty(message.AttachedFilePath))
                                                 {
-                                                    <i class="notika-icon notika-paperclip" style="color: #a5a5a5; font-size: 16px;"></i>
+                                                    <i class="notika-icon notika-paperclip" style="color: #a5a5a5; font-size: 16px;" title="Ekli Dosya Var"></i>
                                                 }
                                             </td>
 

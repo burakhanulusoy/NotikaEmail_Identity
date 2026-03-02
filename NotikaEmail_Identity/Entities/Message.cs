@@ -25,8 +25,8 @@ namespace NotikaEmail_Identity.Entities
 
         
         public bool IsDeleted { get; set; }
-        
 
+        public bool IsDraft { get; set; }
 
 
 

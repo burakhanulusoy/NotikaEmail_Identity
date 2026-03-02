@@ -8,6 +8,7 @@ using NotikaEmail_Identity.Models;
 using NotikaEmail_Identity.Services.CategoryServices;
 using NotikaEmail_Identity.Services.MessageServices;
 using PagedList.Core;
+using System.Threading.Tasks;
 
 namespace NotikaEmail_Identity.Controllers
 {
@@ -347,14 +348,78 @@ namespace NotikaEmail_Identity.Controllers
 
 
 
+        [HttpPost]
+        public async Task<IActionResult> SaveDraftMessage(SendMessageViewModel dto)
+        {
+            // Aktif kullanıcıyı buluyoruz
+            var sender = await _userManager.FindByNameAsync(User.Identity.Name);
+
+            // Alıcı maili yazılmışsa alıcıyı bulalım, yazılmamışsa boş (null) kalsın
+            int? receiverId = null;
+            if (!string.IsNullOrEmpty(dto.ReceiverEmail))
+            {
+                var receiver = await _userManager.FindByEmailAsync(dto.ReceiverEmail);
+                if (receiver != null)
+                {
+                    // Identity'den gelen ID string ise int'e çeviriyoruz (CS0029 Hata Çözümü)
+                    receiverId = Convert.ToInt32(receiver.Id);
+                }
+            }
+
+            string? attachedFilePath = null;
+
+            // Dosya varsa onu da kaydedelim (Senin yazdığın kodun aynısı)
+            if (dto.AttachedFile != null && dto.AttachedFile.Length > 0)
+            {
+                string uploadsFolder = Path.Combine(_hostEnvironment.WebRootPath, "attachments");
+                if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+
+                string uniqueFileName = Guid.NewGuid().ToString() + "_" + dto.AttachedFile.FileName;
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await dto.AttachedFile.CopyToAsync(fileStream);
+                }
+                attachedFilePath = "/attachments/" + uniqueFileName;
+            }
+
+            // Mesajı Taslak Olarak Oluşturuyoruz
+            var message = new CreateMessageDto()
+            {
+                Subject = dto.Subject ?? "Konusuz Taslak", // Konu boşsa default isim ata
+                MessageDetail = dto.MessageDetail ?? "",
+
+                // Eğer Message entity'sinde ReceiverId nullable (int?) DEĞİLSE ve sistem hata verirse, 
+                // buraya geçici olarak sender'ın kendi ID'sini atayabiliriz. Ama şimdilik böyle kalsın.
+                ReceiverId = receiverId ?? 0,
+
+                SenderId = Convert.ToInt32(sender.Id), // CS0029 Hata Çözümü
+                SendDate = DateTime.Now,
+                CategoryId = dto.MessageCategoryId,
+                AttachedFilePath = attachedFilePath,
+                IsDeleted = false,
+                IsDraft = true // İŞTE CAN ALICI NOKTA: Bunu true yapıyoruz ki taslak olsun!
+            };
+
+            // Veritabanına Kaydet
+            await _messageService.CreateAsync(message);
+
+            // Javascript'e "İşlem Başarılı" mesajı dön
+            return Json(new { success = true });
+        }
 
 
 
+        public async Task<IActionResult> DraftBox(int page = 1, int pageSize = 12)
+        {
+            var messages=await _messageService.GetAllDrafAsync();
+            var values = new PagedList<ResultMessageDto>(messages.AsQueryable(), page, pageSize);
+
+            return View(values);
 
 
-
-
-
+        }
 
 
 

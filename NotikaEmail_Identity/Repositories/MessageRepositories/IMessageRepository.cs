@@ -37,6 +37,8 @@ namespace NotikaEmail_Identity.Repositories.MessageRepositories
 
         Task<Message> GetMessageUserSendDateAsync(int id);
 
+        //taslaklar
+        Task<List<Message>> GetAllDrafAsync();
 
 
     }

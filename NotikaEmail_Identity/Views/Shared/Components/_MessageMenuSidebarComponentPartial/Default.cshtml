@@ -5,6 +5,8 @@
     var currentUrl = Context.Request.Path.ToString().ToLower();
 }
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
 <style>
     /* "Yeni Mesaj Oluştur" Butonu Özelleştirmesi */
     .compose-ml .btn-compose {
@@ -68,13 +70,22 @@
         font-weight: 600;
         margin-top: 1px;
     }
+
+    /* İkonlar ile metin arası mesafe ayarı */
+    .inbox-st-nav li a i {
+        margin-right: 8px;
+        font-size: 16px;
+        vertical-align: middle;
+    }
 </style>
 
 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
     <div class="inbox-left-sd">
 
         <div class="compose-ml">
-            <a class="btn btn-compose" href="/Default/SendMessage">Yeni Mesaj Oluştur</a>
+            <a class="btn btn-compose" href="/Default/SendMessage">
+                <i class="fa-solid fa-pen-to-square"></i> Yeni Mesaj Oluştur
+            </a>
         </div>
 
         <div class="inbox-status" style="margin-top: 10px;">
@@ -82,20 +93,20 @@
 
                 <li class="@(currentUrl.Contains("inbox") || currentUrl == "/default" || currentUrl == "/" ? "active-menu" : "")">
                     <a href="/Default/Inbox">
-                        <i class="notika-icon notika-mail"></i> Gelen Kutusu
+                        <i class="fa-solid fa-inbox fa-fw"></i> Gelen Kutusu
                         <span class="pull-right mail-badge">@ViewBag.count</span>
                     </a>
                 </li>
 
                 <li class="@(currentUrl.Contains("sendbox") ? "active-menu" : "")">
                     <a href="/Default/SendBox">
-                        <i class="notika-icon notika-sent"></i> Giden Kutusu
+                        <i class="fa-solid fa-paper-plane fa-fw"></i> Giden Kutusu
                     </a>
                 </li>
 
-                <li><a href="#"><i class="notika-icon notika-draft"></i> Arşivlerim</a></li>
-                <li><a href="/Default/SpamMessages"><i class="notika-icon notika-draft"></i> Spamlar</a></li>
-                <li><a href="/Default/GarbageBox"><i class="notika-icon notika-trash"></i> Çöp Kutusu</a></li>
+                <li><a href="/Default/DraftBox"><i class="fa-solid fa-file-lines fa-fw"></i> Taslaklarım</a></li>
+                <li><a href="/Default/SpamMessages"><i class="fa-solid fa-shield-virus fa-fw"></i> Spamlar</a></li>
+                <li><a href="/Default/GarbageBox"><i class="fa-solid fa-trash-can fa-fw"></i> Çöp Kutusu</a></li>
             </ul>
         </div>
 
@@ -107,10 +118,10 @@
 
         <div class="inbox-status">
             <ul class="inbox-st-nav inbox-nav-mg">
-                <li><a href="#"><i class="notika-icon notika-success"></i> Forum</a></li>
-                <li><a href="/Payment/PlanSummary"><i class="notika-icon notika-star"></i> Preminum Ol</a></li>
-                <li><a href="/Profile/Index"><i class="notika-icon notika-settings"></i> Ayarlar</a></li>
-                <li><a href="#"><i class="notika-icon notika-support"></i> Destek Hattı</a></li>
+                <li><a href="/Default/Logout"><i class="fa-solid fa-right-from-bracket fa-fw"></i> Çıkış Yap</a></li>
+                <li><a href="/Payment/PlanSummary"><i class="fa-solid fa-crown fa-fw"></i> Premium Ol</a></li>
+                <li><a href="/Profile/Index"><i class="fa-solid fa-gear fa-fw"></i> Ayarlar</a></li>
+                <li><a href="#"><i class="fa-solid fa-headset fa-fw"></i> Destek Hattı</a></li>
             </ul>
         </div>
 

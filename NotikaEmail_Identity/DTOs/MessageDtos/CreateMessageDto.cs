@@ -1,11 +1,13 @@
 ﻿using NotikaEmail_Identity.DTOs.CategoryDtos;
+using NotikaEmail_Identity.DTOs.UserDtos;
 
 namespace NotikaEmail_Identity.DTOs.MessageDtos
 {
     public class CreateMessageDto
     {
+        public ResultUserDto Receiver { get; set; }
         public int ReceiverId { get; set; }
-
+        public ResultUserDto Sender { get; set; }
         public int SenderId { get; set; }
 
 
@@ -18,12 +20,11 @@ namespace NotikaEmail_Identity.DTOs.MessageDtos
 
         public ResultCategoryDto Category { get; set; }
         public int CategoryId { get; set; }
-
         public string? AttachedFilePath { get; set; }
 
+
         public bool IsDeleted { get; set; }
-
-
+        public bool IsDraft { get; set; }
 
 
     }

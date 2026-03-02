@@ -33,5 +33,7 @@ namespace NotikaEmail_Identity.Services.MessageServices
         Task<ResultMessageDto> GetMessageUserSendDateAsync(int id);
 
 
+        Task<List<ResultMessageDto>> GetAllDrafAsync();
+
     }
 }

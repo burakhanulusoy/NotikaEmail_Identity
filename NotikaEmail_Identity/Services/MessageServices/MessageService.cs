@@ -41,6 +41,14 @@ namespace NotikaEmail_Identity.Services.MessageServices
             return _mapper.Map<List<ResultMessageDto>>(messages);
         }
 
+        public async Task<List<ResultMessageDto>> GetAllDrafAsync()
+        {
+            var message=await _messageRepository.GetAllDrafAsync();
+            return _mapper.Map<List<ResultMessageDto>>(message);
+
+
+        }
+
         public async Task<List<ResultMessageDto>> GetAllFiterWithSenderAsync(Expression<Func<Message, bool>> filter)
         {
             var messages = await _messageRepository.GetAllFiterWithSenderAsync(filter);
