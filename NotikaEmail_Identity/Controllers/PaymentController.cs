@@ -340,42 +340,85 @@ namespace NotikaEmail_Identity.Controllers
 
         private async Task<InstallmentResponse> GetInstallmentsAsync(string binNumber, decimal price)
         {
-            // Bin numarasının ilk 6 hanesi loglanır, güvenlidir.
             _logger.LogInformation("🔍 TAKSİT SORGUSU: Bin: {Bin} | Tutar: {Price}", binNumber, price);
 
             InstallmentRequest request = new() { Locale = "tr", Price = price, BinNumber = binNumber };
 
-            // ... (HTTP İsteği Kodları Aynı) ...
             using var client = new HttpClient();
             JsonSerializerOptions jsonOptions = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
             var json = JsonSerializer.Serialize(request, jsonOptions);
+
             var authToken = IyzicoAuthHelper.GenerateAuthToke(_settings.ApiKey!, _settings.SecretKey!, "/payment/iyzipos/installment", json);
             client.DefaultRequestHeaders.Add("Authorization", authToken);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await client.PostAsync(_settings.BaseUrl + "/payment/iyzipos/installment", content);
-            var responseString = await response.Content.ReadAsStringAsync();
-
-            using var doc = JsonDocument.Parse(responseString);
-            var root = doc.RootElement;
-            var status = root.GetProperty("status").GetString();
-
-            if (status == "success")
+            try
             {
-                _logger.LogDebug("✅ TAKSİT SEÇENEKLERİ GELDİ: Bin: {Bin}", binNumber);
-                // ... (Parse Kodları Aynı) ...
-                // Dönüş modelini oluşturup return ediyorsun
-                var result = new InstallmentResponse { Status = "success", Success = true };
-                // ... Detay doldurma ...
-                return result; // (Not: Senin kodundaki parse mantığı buraya gelecek)
+                var response = await client.PostAsync(_settings.BaseUrl + "/payment/iyzipos/installment", content);
+                var responseString = await response.Content.ReadAsStringAsync();
+
+                using var doc = JsonDocument.Parse(responseString);
+                var root = doc.RootElement;
+
+                var status = root.TryGetProperty("status", out var statusProp) ? statusProp.GetString() : "failure";
+
+                if (status == "success")
+                {
+                    _logger.LogInformation("✅ TAKSİT BİLGİSİ HAM VERİ ALINDI: Bin: {Bin}", binNumber);
+
+                    var result = new InstallmentResponse
+                    {
+                        Status = "success",
+                        Success = true,
+                        InstallmentDetails = new List<InstallmentDetailModel>()
+                    };
+
+                    if (root.TryGetProperty("installmentDetails", out var detailsArray))
+                    {
+                        foreach (var detail in detailsArray.EnumerateArray())
+                        {
+                            // DÜZELTME: Hata veren BankCode ve BankName satırları kaldırıldı.
+                            var detailModel = new InstallmentDetailModel
+                            {
+                                InstallmentPrices = new List<InstallmentPriceModel>()
+                            };
+
+                            if (detail.TryGetProperty("installmentPrices", out var pricesArray))
+                            {
+                                foreach (var item in pricesArray.EnumerateArray())
+                                {
+                                    detailModel.InstallmentPrices.Add(new InstallmentPriceModel
+                                    {
+                                        InstallmentPrice = item.GetProperty("installmentPrice").GetDecimal(),
+                                        TotalPrice = item.GetProperty("totalPrice").GetDecimal(),
+                                        InstallmentNumber = item.GetProperty("installmentNumber").GetInt32()
+                                    });
+                                }
+                            }
+                            result.InstallmentDetails.Add(detailModel);
+                        }
+                    }
+
+                    return result;
+                }
+                else
+                {
+                    var errMsg = root.TryGetProperty("errorMessage", out var err) ? err.GetString() : "Bilinmeyen hata";
+                    _logger.LogWarning("⚠️ TAKSİT SORGUSU BAŞARISIZ: Bin: {Bin} | Hata: {Error}", binNumber, errMsg);
+
+                    return new InstallmentResponse { Status = "failure", Success = false, ErrorMessage = errMsg };
+                }
             }
-            else
+            catch (Exception ex)
             {
-                var errMsg = root.GetProperty("errorMessage").GetString();
-                _logger.LogWarning("⚠️ TAKSİT SORGUSU BAŞARISIZ: Bin: {Bin} | Hata: {Error}", binNumber, errMsg);
-                return new InstallmentResponse { Status = "failure", Success = false, ErrorMessage = errMsg };
+                _logger.LogCritical(ex, "🔥 TAKSİT HATASI: Bin: {Bin}", binNumber);
+                return new InstallmentResponse { Status = "failure", Success = false, ErrorMessage = "Sistem hatası." };
             }
         }
+
+
+
+
 
         public IActionResult PlanSummary()
         {
