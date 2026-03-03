@@ -42,9 +42,49 @@
       {
         "Version": 1,
         "Type": "Trial",
+        "TrainerName": "FastTreeOva",
+        "Score": 0.88205266955266948,
+        "RuntimeInSeconds": 0.602,
+        "Parameter": {
+          "_SCHEMA_": "e0 * e1 * e2 * e3 * e10",
+          "e0": {
+            "InputColumnName": "Message",
+            "OutputColumnName": "Message"
+          },
+          "e1": {
+            "InputColumnNames": [
+              "Message"
+            ],
+            "OutputColumnName": "Features"
+          },
+          "e10": {
+            "OutputColumnName": "PredictedLabel",
+            "InputColumnName": "PredictedLabel"
+          },
+          "e2": {
+            "OutputColumnName": "Label",
+            "InputColumnName": "Label",
+            "AddKeyValueAnnotationsAsText": false
+          },
+          "e3": {
+            "NumberOfLeaves": 9,
+            "MinimumExampleCountPerLeaf": 15,
+            "NumberOfTrees": 6,
+            "MaximumBinCountPerFeature": 231,
+            "FeatureFraction": 0.99999999,
+            "LearningRate": 0.60624230923515821,
+            "LabelColumnName": "Label",
+            "FeatureColumnName": "Features",
+            "DiskTranspose": false
+          }
+        }
+      },
+      {
+        "Version": 1,
+        "Type": "Trial",
         "TrainerName": "FastForestOva",
-        "Score": 0.82947691197691209,
-        "RuntimeInSeconds": 0.525,
+        "Score": 0.80594155844155835,
+        "RuntimeInSeconds": 0.951,
         "Parameter": {
           "_SCHEMA_": "e0 * e1 * e2 * e4 * e10",
           "e0": {
@@ -67,9 +107,51 @@
             "AddKeyValueAnnotationsAsText": false
           },
           "e4": {
-            "NumberOfTrees": 4,
-            "NumberOfLeaves": 4,
-            "FeatureFraction": 1.0,
+            "NumberOfTrees": 124,
+            "NumberOfLeaves": 20,
+            "FeatureFraction": 0.8259562,
+            "LabelColumnName": "Label",
+            "FeatureColumnName": "Features"
+          }
+        }
+      },
+      {
+        "Version": 1,
+        "Type": "Trial",
+        "TrainerName": "LightGbmMulti",
+        "Score": 0.798517316017316,
+        "RuntimeInSeconds": 0.8,
+        "Parameter": {
+          "_SCHEMA_": "e0 * e1 * e2 * e5 * e10",
+          "e0": {
+            "InputColumnName": "Message",
+            "OutputColumnName": "Message"
+          },
+          "e1": {
+            "InputColumnNames": [
+              "Message"
+            ],
+            "OutputColumnName": "Features"
+          },
+          "e10": {
+            "OutputColumnName": "PredictedLabel",
+            "InputColumnName": "PredictedLabel"
+          },
+          "e2": {
+            "OutputColumnName": "Label",
+            "InputColumnName": "Label",
+            "AddKeyValueAnnotationsAsText": false
+          },
+          "e5": {
+            "NumberOfLeaves": 979,
+            "MinimumExampleCountPerLeaf": 20,
+            "LearningRate": 0.99999977667298645,
+            "NumberOfTrees": 219,
+            "SubsampleFraction": 0.99999977667298645,
+            "MaximumBinCountPerFeature": 212,
+            "FeatureFraction": 0.98026099422535773,
+            "L1Regularization": 4.80299266542757E-10,
+            "L2Regularization": 0.99999977667298645,
             "LabelColumnName": "Label",
             "FeatureColumnName": "Features"
           }
@@ -79,8 +161,8 @@
         "Version": 1,
         "Type": "Trial",
         "TrainerName": "FastForestOva",
-        "Score": 0.82947691197691209,
-        "RuntimeInSeconds": 0.56,
+        "Score": 0.79760822510822516,
+        "RuntimeInSeconds": 3.697,
         "Parameter": {
           "_SCHEMA_": "e0 * e1 * e2 * e4 * e10",
           "e0": {
@@ -103,9 +185,9 @@
             "AddKeyValueAnnotationsAsText": false
           },
           "e4": {
-            "NumberOfTrees": 4,
-            "NumberOfLeaves": 4,
-            "FeatureFraction": 1.0,
+            "NumberOfTrees": 1427,
+            "NumberOfLeaves": 21,
+            "FeatureFraction": 0.62527126,
             "LabelColumnName": "Label",
             "FeatureColumnName": "Features"
           }
@@ -115,8 +197,8 @@
         "Version": 1,
         "Type": "Trial",
         "TrainerName": "FastForestOva",
-        "Score": 0.82947691197691209,
-        "RuntimeInSeconds": 0.666,
+        "Score": 0.79685064935064942,
+        "RuntimeInSeconds": 0.655,
         "Parameter": {
           "_SCHEMA_": "e0 * e1 * e2 * e4 * e10",
           "e0": {
@@ -139,81 +221,9 @@
             "AddKeyValueAnnotationsAsText": false
           },
           "e4": {
-            "NumberOfTrees": 4,
-            "NumberOfLeaves": 6,
-            "FeatureFraction": 1.0,
-            "LabelColumnName": "Label",
-            "FeatureColumnName": "Features"
-          }
-        }
-      },
-      {
-        "Version": 1,
-        "Type": "Trial",
-        "TrainerName": "FastForestOva",
-        "Score": 0.82947691197691209,
-        "RuntimeInSeconds": 0.595,
-        "Parameter": {
-          "_SCHEMA_": "e0 * e1 * e2 * e4 * e10",
-          "e0": {
-            "InputColumnName": "Message",
-            "OutputColumnName": "Message"
-          },
-          "e1": {
-            "InputColumnNames": [
-              "Message"
-            ],
-            "OutputColumnName": "Features"
-          },
-          "e10": {
-            "OutputColumnName": "PredictedLabel",
-            "InputColumnName": "PredictedLabel"
-          },
-          "e2": {
-            "OutputColumnName": "Label",
-            "InputColumnName": "Label",
-            "AddKeyValueAnnotationsAsText": false
-          },
-          "e4": {
-            "NumberOfTrees": 4,
-            "NumberOfLeaves": 4,
-            "FeatureFraction": 1.0,
-            "LabelColumnName": "Label",
-            "FeatureColumnName": "Features"
-          }
-        }
-      },
-      {
-        "Version": 1,
-        "Type": "Trial",
-        "TrainerName": "FastForestOva",
-        "Score": 0.82947691197691209,
-        "RuntimeInSeconds": 0.625,
-        "Parameter": {
-          "_SCHEMA_": "e0 * e1 * e2 * e4 * e10",
-          "e0": {
-            "InputColumnName": "Message",
-            "OutputColumnName": "Message"
-          },
-          "e1": {
-            "InputColumnNames": [
-              "Message"
-            ],
-            "OutputColumnName": "Features"
-          },
-          "e10": {
-            "OutputColumnName": "PredictedLabel",
-            "InputColumnName": "PredictedLabel"
-          },
-          "e2": {
-            "OutputColumnName": "Label",
-            "InputColumnName": "Label",
-            "AddKeyValueAnnotationsAsText": false
-          },
-          "e4": {
-            "NumberOfTrees": 4,
-            "NumberOfLeaves": 4,
-            "FeatureFraction": 1.0,
+            "NumberOfTrees": 24,
+            "NumberOfLeaves": 12,
+            "FeatureFraction": 0.94123024,
             "LabelColumnName": "Label",
             "FeatureColumnName": "Features"
           }
@@ -243,7 +253,7 @@
     "Version": 2,
     "Subsampling": false,
     "Type": "ClassificationTrainingOption",
-    "TrainingTime": 10,
+    "TrainingTime": 15,
     "LabelColumn": "Label",
     "ValidationOption": {
       "Version": 0,

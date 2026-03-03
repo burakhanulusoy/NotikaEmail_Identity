@@ -46,7 +46,7 @@ namespace NotikaEmail_Identity.Repositories.MessageRepositories
 
 
 
-        Task<List<Message>> GetAllSpamAsync();
+        Task<List<Message>> GetAllSpamAsync(int id);
 
 
 

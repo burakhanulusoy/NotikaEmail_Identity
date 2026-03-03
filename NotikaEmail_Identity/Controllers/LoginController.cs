@@ -6,281 +6,271 @@ using System.Security.Claims;
 
 namespace NotikaEmail_Identity.Controllers
 {
-    public class LoginController(SignInManager<AppUser> _signInManager,UserManager<AppUser> _userManager,ILogger<LoginController> _logger) : Controller
+    public class LoginController(SignInManager<AppUser> _signInManager, UserManager<AppUser> _userManager, ILogger<LoginController> _logger) : Controller
     {
-
-
         public IActionResult SignIn()
-        { 
-
-
-
+        {
             return View();
         }
-
 
         [HttpPost]
         public async Task<IActionResult> SignIn(LoginUserViewModel model)
         {
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
 
-            var user=await _userManager.FindByEmailAsync(model.Email);
+            // Giriş denemesi başladığı an logluyoruz (Debug seviyesi yeterli, console'u boğmasın)
+            _logger.LogDebug("🔑 GİRİŞ DENEMESİ: {Email} giriş butonuna bastı. IP: {Ip}", model.Email, ipAddress);
 
-            if( user is null )
+            var user = await _userManager.FindByEmailAsync(model.Email);
+
+            if (user is null)
             {
+                // Güvenlik: Olmayan mailleri deneyenleri tespit etmek için Warning
+                _logger.LogWarning("⚠️ GEÇERSİZ KULLANICI: Sistemde kayıtlı olmayan '{Email}' adresiyle giriş denendi. IP: {Ip}", model.Email, ipAddress);
 
-                ModelState.AddModelError("","Bu emaile kayıtlı hesap bulunamadı.");
+                ModelState.AddModelError("", "Bu emaile kayıtlı hesap bulunamadı.");
                 return View(model);
             }
 
             bool hasPassword = await _userManager.HasPasswordAsync(user);
-            
+
             if (!hasPassword)
             {
-                ModelState.AddModelError("", "Bu hesap Google ile oluşturulmuş ve henüz bir şifre belirlenmemiş. Lütfen 'Şifremi unuttum' diyerek şifre oluşturun veya Google butonu ile giriş yapın.");
+                _logger.LogWarning("🚫 ŞİFRESİZ ERİŞİM DENEMESİ: {Email} (Google/Face hesaplı) şifre ile girmeye çalıştı.", user.Email);
+                ModelState.AddModelError("", "Bu hesap Google/Facebook ile oluşturulmuş ve henüz bir şifre belirlenmemiş. Lütfen 'Şifremi unuttum' diyerek şifre oluşturun veya Sosyal Medya butonu ile giriş yapın.");
                 return View(model);
             }
-            //beni hatırla,her yablıs gırdıgınde sayac artıyor ona gor ehesap kılutlebır 10 dk
-            var result = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, true);
 
-            if(!result.Succeeded)
+            // Lockout (Kilitleme) mekanizması aktifleştirildi (4. parametre true yapıldı)
+            var result = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, lockoutOnFailure: true);
+
+            if (result.Succeeded)
+            {
+                if (user.EmailConfirmed is false)
+                {
+                    _logger.LogWarning("⏳ ONAYSIZ GİRİŞ: {Email} şifresi doğru ama maili onaylamamış. Giriş engellendi.", user.Email);
+                    await _signInManager.SignOutAsync(); // İçeri almadan atıyoruz
+                    ModelState.AddModelError("", "Kayıtlı emailiniz aktifleştirilmemiş lütfen kontrol edin.");
+                    return View(model);
+                }
+
+                _logger.LogInformation("✅ BAŞARILI GİRİŞ: {UserEmail} sisteme giriş yaptı. IP: {Ip}", user.Email, ipAddress);
+                return RedirectToAction("Inbox", "Default");
+            }
+
+            if (result.IsLockedOut)
+            {
+                _logger.LogCritical("🔒 HESAP KİLİTLENDİ: {Email} çok fazla hatalı deneme yaptığı için geçici olarak kilitlendi. IP: {Ip}", user.Email, ipAddress);
+                ModelState.AddModelError("", "Çok fazla hatalı giriş yaptınız. Hesabınız geçici olarak kilitlendi. Lütfen 5 dakika sonra tekrar deneyiniz.");
+                return View(model);
+            }
+            else
             {
                 // HATA LOGU (Seq'te sarı renkte dikkat çekecek!)
-                _logger.LogWarning("Güvenlik Uyarısı: {UserEmail} adresine sahip kişi hatalı şifre ile sisteme girmeye çalıştı!", model.Email);
+                _logger.LogWarning("🛑 HATALI ŞİFRE: {UserEmail} yanlış şifre girdi. IP: {Ip}", model.Email, ipAddress);
                 ModelState.AddModelError("", "Email veya şifre hatalı.");
                 return View(model);
             }
-
-            if (user.EmailConfirmed is false)
-            {
-                ModelState.AddModelError("", "Kayıtlı emailiniz aktifleştirilmemiş lütfen kontrol edin.");
-                return View(model);
-            }
-            _logger.LogInformation("Sistem İşlemi: {UserEmail} adlı kullanıcı sisteme başarıyla giriş yaptı.", user.Email);
-
-
-
-            return RedirectToAction("Inbox", "Default");
-
-
         }
 
 
-
-
-        // 1. KULLANICIYI GOOGLE'A GÖNDEREN METOT
+        // ==========================================
+        // 1. GOOGLE LOGIN SÜRECİ
+        // ==========================================
         [HttpGet]
         public IActionResult GoogleLogin()
         {
-            // Google'dan dönüş yapacağı adresi belirliyoruz (Aşağıdaki GoogleResponse metodu)
             string redirectUrl = Url.Action("GoogleResponse", "Login");
-
-            // Identity'nin Google için hazırladığı özellikleri alıyoruz
             var properties = _signInManager.ConfigureExternalAuthenticationProperties("Google", redirectUrl);
-
-            // Kullanıcıyı Google'ın giriş ekranına fırlatıyoruz
+            _logger.LogInformation("🌐 GOOGLE YÖNLENDİRME: Bir kullanıcı Google girişine tıkladı.");
             return new ChallengeResult("Google", properties);
         }
 
-        // 2. GOOGLE'DAN DÖNÜŞTE KARŞILAYAN METOT
         [HttpGet]
         public async Task<IActionResult> GoogleResponse()
         {
-            // Google'dan gelen kullanıcı bilgilerini (Email, Ad vb.) okuyoruz
             var info = await _signInManager.GetExternalLoginInfoAsync();
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
 
             if (info == null)
             {
-                return RedirectToAction("SignIn"); // Bir hata olduysa geri dön
+                _logger.LogError("❌ GOOGLE HATASI: ExternalLoginInfo null döndü. Google tarafında veya callback url'de sorun olabilir.");
+                return RedirectToAction("SignIn");
             }
 
-            // 1. İHTİMAL: Bu adam daha önce Google ile giriş yapmış mı?
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+
+            // 1. İHTİMAL: Zaten bağlı mı?
             var signInResult = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
 
             if (signInResult.Succeeded)
             {
-                // GOOGLE İLE BAŞARILI GİRİŞ LOGU
-                _logger.LogInformation("Sistem İşlemi: Bir kullanıcı Google hesabı ile sisteme başarıyla giriş yaptı. ProviderKey: {Key}", info.ProviderKey);
-                return RedirectToAction("Inbox", "Default"); // Direkt içeri al
+                _logger.LogInformation("✅ GOOGLE İLE GİRİŞ: {Email} başarıyla giriş yaptı. ProviderKey: {Key}", email, info.ProviderKey);
+                return RedirectToAction("Inbox", "Default");
             }
 
-            // 2. İHTİMAL: İlk defa Google ile geliyor! (Kayıt + Giriş)
-            if (!signInResult.Succeeded)
+            if (signInResult.IsLockedOut)
             {
-                // Google'dan gerekli tüm bilgileri detaylıca çekiyoruz
-                string email = info.Principal.FindFirstValue(ClaimTypes.Email);
-                string firstName = info.Principal.FindFirstValue(ClaimTypes.GivenName);
-                string lastName = info.Principal.FindFirstValue(ClaimTypes.Surname);
+                _logger.LogWarning("🔒 KİLİTLİ HESAP (GOOGLE): {Email} kilitli olduğu için Google ile de giremedi.", email);
+                return RedirectToAction("SignIn");
+            }
 
-                // İsim veya soyisim boş gelirse diye güvenlik önlemi (Name claim'i ad+soyadı birleşik verir)
-                if (string.IsNullOrEmpty(firstName)) firstName = info.Principal.FindFirstValue(ClaimTypes.Name) ?? "Kullanıcı";
-                if (string.IsNullOrEmpty(lastName)) lastName = "";
+            // 2. İHTİMAL: İlk defa geliyor veya hesap var ama Google bağlı değil.
+            string firstName = info.Principal.FindFirstValue(ClaimTypes.GivenName) ?? info.Principal.FindFirstValue(ClaimTypes.Name) ?? "GoogleUser";
+            string lastName = info.Principal.FindFirstValue(ClaimTypes.Surname) ?? "";
 
-                if (email != null)
+            if (email != null)
+            {
+                var user = await _userManager.FindByEmailAsync(email);
+
+                if (user == null)
                 {
-                    // Mail adresinin @ işaretinden önceki kısmını Kullanıcı Adı (UserName) yapıyoruz
-                    string generatedUserName = email.Split('@')[0];
+                    // --- YENİ KULLANICI OLUŞTURMA ---
+                    string generatedUserName = email.Split('@')[0]; // Örn: ahmet123
 
-                    // Veritabanımızda bu mailde biri var mı bakıyoruz
-                    var user = await _userManager.FindByEmailAsync(email);
-
-                    if (user == null)
+                    user = new AppUser
                     {
-                        // Yoksa arka planda ona otomatik, gerçek bilgileriyle ve şifresiz bir hesap açıyoruz!
-                        user = new AppUser
-                        {
-                            Email = email,
-                            UserName = generatedUserName, // Örn: ahmet.yilmaz
-                            Name = firstName,             // Örn: Ahmet
-                            Surname = lastName,           // Örn: Yılmaz
-                            EmailConfirmed = true,        // Google'dan geldiği için doğrulama yapmıyoruz
-                            CreatedDate = DateTime.Now,
-                            PhoneNumber = "Belirtilmemiş",
-                            Job = "Belirtilmemiş",
-                            AboutMe = "Belirtilmemiş",
-                            City="Belirtilmemiş",
-                            ActivationCode = 123456       // Gerekli bir alan olduğu için formalite
-                        };
+                        Email = email,
+                        UserName = generatedUserName,
+                        Name = firstName,
+                        Surname = lastName,
+                        EmailConfirmed = true, // Google zaten onayladı
+                        CreatedDate = DateTime.Now,
+                        PhoneNumber = "Belirtilmemiş",
+                        Job = "Belirtilmemiş",
+                        AboutMe = "Google ile kayıt oldu.",
+                        City = "Belirtilmemiş",
+                        ActivationCode = 0 // Onaylı olduğu için önemsiz
+                    };
 
-                        var createResult = await _userManager.CreateAsync(user);
-                        if (createResult.Succeeded)
-                        {
-                            // Kullanıcıyı oluşturduk, şimdi Google hesabı ile eşleştiriyoruz
-                            await _userManager.AddLoginAsync(user, info);
-                        }
+                    var createResult = await _userManager.CreateAsync(user);
+                    if (createResult.Succeeded)
+                    {
+                        await _userManager.AddLoginAsync(user, info); // Google'ı bağla
+                        await _userManager.AddToRoleAsync(user, "User"); // Rol ata
+
+                        _logger.LogInformation("🆕 YENİ KAYIT (GOOGLE): {Email} için otomatik hesap oluşturuldu ve giriş yapıldı. IP: {Ip}", email, ipAddress);
+
+                        await _signInManager.SignInAsync(user, isPersistent: false);
+                        return RedirectToAction("Inbox", "Default");
                     }
                     else
                     {
-                        // Kullanıcı var ama daha önce Google bağlamamışsa, hesabını Google ile eşleştir
-                        await _userManager.AddLoginAsync(user, info);
+                        string errors = string.Join(", ", createResult.Errors.Select(e => e.Description));
+                        _logger.LogError("🔥 KAYIT HATASI (GOOGLE): {Email} oluşturulurken hata çıktı: {Errors}", email, errors);
                     }
-
-                    // Son olarak adamı oturum açmış şekilde sisteme alıyoruz
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-
-
-                    _logger.LogInformation("Sistem İşlemi: {UserEmail} adlı kullanıcı sisteme Google ile YENİ KAYIT oldu ve giriş yaptı.", email);
-
-                    await _userManager.AddToRoleAsync(user, "User");
-
-                    return RedirectToAction("Inbox", "Default");
+                }
+                else
+                {
+                    // --- HESAP VAR, EŞLEŞTİRME ---
+                    var addLoginResult = await _userManager.AddLoginAsync(user, info);
+                    if (addLoginResult.Succeeded)
+                    {
+                        _logger.LogInformation("🔗 HESAP EŞLEŞTİRİLDİ: {Email} mevcut hesabını Google ile bağladı.", email);
+                        await _signInManager.SignInAsync(user, isPersistent: false);
+                        return RedirectToAction("Inbox", "Default");
+                    }
+                    else
+                    {
+                        _logger.LogWarning("⚠️ EŞLEŞTİRME HATASI: {Email} hesabı Google ile bağlanamadı.", email);
+                    }
                 }
             }
-
-            // Herhangi bir aksilikte SignIn'e geri fırlat
             return RedirectToAction("SignIn");
         }
 
-        // 1. KULLANICIYI FACEBOOK'A GÖNDEREN METOT
+        // ==========================================
+        // 2. FACEBOOK LOGIN SÜRECİ
+        // ==========================================
         [HttpGet]
         public IActionResult FacebookLogin()
         {
-            // Facebook'tan dönüş yapacağı adresi belirliyoruz
             string redirectUrl = Url.Action("FacebookResponse", "Login");
-
-            // Identity'nin Facebook için hazırladığı özellikleri alıyoruz
             var properties = _signInManager.ConfigureExternalAuthenticationProperties("Facebook", redirectUrl);
-
-            // Kullanıcıyı Facebook'un giriş ekranına fırlatıyoruz
+            _logger.LogInformation("📘 FACEBOOK YÖNLENDİRME: Bir kullanıcı Facebook girişine tıkladı.");
             return new ChallengeResult("Facebook", properties);
         }
 
-        // 2. FACEBOOK'TAN DÖNÜŞTE KARŞILAYAN METOT
         [HttpGet]
         public async Task<IActionResult> FacebookResponse()
         {
-            // Facebook'tan gelen kullanıcı bilgilerini (Email, Ad vb.) okuyoruz
             var info = await _signInManager.GetExternalLoginInfoAsync();
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
 
             if (info == null)
             {
-                return RedirectToAction("SignIn"); // Bir hata olduysa geri dön
+                _logger.LogError("❌ FACEBOOK HATASI: ExternalLoginInfo null döndü.");
+                return RedirectToAction("SignIn");
             }
 
-            // 1. İHTİMAL: Bu adam daha önce Facebook ile giriş yapmış mı?
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+
+            // 1. İHTİMAL: Zaten bağlı mı?
             var signInResult = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
 
             if (signInResult.Succeeded)
             {
-                // FACEBOOK İLE BAŞARILI GİRİŞ LOGU
-                _logger.LogInformation("Sistem İşlemi: Bir kullanıcı Facebook hesabı ile sisteme başarıyla giriş yaptı. ProviderKey: {Key}", info.ProviderKey);
-                return RedirectToAction("Inbox", "Default"); // Direkt içeri al
+                _logger.LogInformation("✅ FACEBOOK İLE GİRİŞ: {Email} başarıyla giriş yaptı.", email ?? "Emailsiz Kullanıcı");
+                return RedirectToAction("Inbox", "Default");
             }
 
-            // 2. İHTİMAL: İlk defa Facebook ile geliyor! (Kayıt + Giriş)
-            if (!signInResult.Succeeded)
+            // 2. İHTİMAL: Yeni Kayıt / Eşleştirme
+            string firstName = info.Principal.FindFirstValue(ClaimTypes.GivenName) ?? info.Principal.FindFirstValue(ClaimTypes.Name) ?? "FacebookUser";
+            string lastName = info.Principal.FindFirstValue(ClaimTypes.Surname) ?? "";
+
+            // Facebook bazen email vermez (Sadece telefonla kayıtlıysa). Bu durumda fake email üretmek zorundayız.
+            if (string.IsNullOrEmpty(email))
             {
-                // Facebook'tan gerekli tüm bilgileri detaylıca çekiyoruz
-                string email = info.Principal.FindFirstValue(ClaimTypes.Email);
-                string firstName = info.Principal.FindFirstValue(ClaimTypes.GivenName);
-                string lastName = info.Principal.FindFirstValue(ClaimTypes.Surname);
+                email = $"{info.ProviderKey}@facebook.user";
+                _logger.LogWarning("⚠️ E-POSTA YOK: Facebook'tan email gelmedi. Geçici ID atandı: {FakeEmail}", email);
+            }
 
-                // İsim veya soyisim boş gelirse diye güvenlik önlemi (Facebook bazen Name claim'inde ad+soyadı birleşik verir)
-                if (string.IsNullOrEmpty(firstName)) firstName = info.Principal.FindFirstValue(ClaimTypes.Name) ?? "Kullanıcı";
-                if (string.IsNullOrEmpty(lastName)) lastName = "";
+            var user = await _userManager.FindByEmailAsync(email);
 
-                // UFAK BİR KONTROL: Facebook bazen mail adresi vermeyebilir (kullanıcı telefonla kaydolmuşsa).
-                // Eğer mail null gelirse, ona sahte ama benzersiz bir mail atıyoruz ki sistemimiz çökmesin.
-                if (string.IsNullOrEmpty(email))
+            if (user == null)
+            {
+                // YENİ KAYIT
+                string generatedUserName = email.Contains("@") ? email.Split('@')[0] : "user" + new Random().Next(1000, 9999);
+
+                user = new AppUser
                 {
-                    email = info.ProviderKey + "@facebook.com";
-                }
+                    Email = email,
+                    UserName = generatedUserName,
+                    Name = firstName,
+                    Surname = lastName,
+                    EmailConfirmed = true,
+                    CreatedDate = DateTime.Now,
+                    PhoneNumber = "Belirtilmemiş",
+                    Job = "Belirtilmemiş",
+                    AboutMe = "Facebook ile kayıt oldu.",
+                    City = "Belirtilmemiş",
+                    ActivationCode = 0
+                };
 
-                if (email != null)
+                var createResult = await _userManager.CreateAsync(user);
+                if (createResult.Succeeded)
                 {
-                    // Mail adresinin @ işaretinden önceki kısmını Kullanıcı Adı (UserName) yapıyoruz
-                    string generatedUserName = email.Split('@')[0];
-
-                    // Veritabanımızda bu mailde biri var mı bakıyoruz
-                    var user = await _userManager.FindByEmailAsync(email);
-
-                    if (user == null)
-                    {
-                        // Yoksa arka planda ona otomatik, gerçek bilgileriyle ve şifresiz bir hesap açıyoruz!
-                        user = new AppUser
-                        {
-                            Email = email,
-                            UserName = generatedUserName,
-                            Name = firstName,
-                            Surname = lastName,
-                            EmailConfirmed = true,
-                            CreatedDate = DateTime.Now,
-                            PhoneNumber = "Belirtilmemiş",
-                            Job = "Belirtilmemiş",
-                            AboutMe = "Belirtilmemiş",
-                            City = "Belirtilmemiş",
-                            ActivationCode = 123456
-                        };
-
-                        var createResult = await _userManager.CreateAsync(user);
-                        if (createResult.Succeeded)
-                        {
-                            // Kullanıcıyı oluşturduk, şimdi Facebook hesabı ile eşleştiriyoruz
-                            await _userManager.AddLoginAsync(user, info);
-                        }
-                    }
-                    else
-                    {
-                        // Kullanıcı var ama daha önce Facebook bağlamamışsa, hesabını Facebook ile eşleştir
-                        await _userManager.AddLoginAsync(user, info);
-                    }
-
-                    // Son olarak adamı oturum açmış şekilde sisteme alıyoruz
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-
-                    _logger.LogInformation("Sistem İşlemi: {UserEmail} adlı kullanıcı sisteme Facebook ile YENİ KAYIT oldu ve giriş yaptı.", email);
-
+                    await _userManager.AddLoginAsync(user, info);
                     await _userManager.AddToRoleAsync(user, "User");
+
+                    _logger.LogInformation("🆕 YENİ KAYIT (FACEBOOK): {Email} için hesap oluşturuldu. IP: {Ip}", email, ipAddress);
+
+                    await _signInManager.SignInAsync(user, isPersistent: false);
                     return RedirectToAction("Inbox", "Default");
                 }
             }
+            else
+            {
+                // VAR OLANI BAĞLA
+                await _userManager.AddLoginAsync(user, info);
 
-            // Herhangi bir aksilikte SignIn'e geri fırlat
+                _logger.LogInformation("🔗 HESAP EŞLEŞTİRİLDİ: {Email} Facebook ile bağlandı.", email);
+
+                await _signInManager.SignInAsync(user, isPersistent: false);
+                return RedirectToAction("Inbox", "Default");
+            }
+
             return RedirectToAction("SignIn");
         }
-
-
-
-
-
     }
 }

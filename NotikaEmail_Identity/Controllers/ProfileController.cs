@@ -9,138 +9,138 @@ using NotikaEmail_Identity.Services.UserServices;
 namespace NotikaEmail_Identity.Controllers
 {
     [Authorize(Roles = "Admin, User")]
-
     public class ProfileController(UserManager<AppUser> _userManager,
         IUserService _userService,
         SignInManager<AppUser> _signInManager,
+        IWebHostEnvironment _hostEnvironment, // Dosya yolu için eklendi
         ILogger<ProfileController> _logger) : Controller
     {
         public async Task<IActionResult> Index()
         {
             var userActive = await _userManager.FindByNameAsync(User.Identity.Name);
+            if (userActive == null) return RedirectToAction("SignIn", "Login");
 
             var userSettings = await _userService.GetByIdAsync(userActive.Id);
+
+            // Kullanıcı sadece profilini görüntülediğinde INFO değil DEBUG kullanırız (Log kirliliğini önlemek için)
+            _logger.LogDebug("👤 PROFİL GÖRÜNTÜLENDİ: {UserEmail} profil sayfasına baktı.", userActive.Email);
 
             return View(userSettings);
         }
 
-
         public async Task<IActionResult> UpdateProfil()
         {
             var user = await _userManager.FindByNameAsync(User.Identity.Name);
-
             var userInfo = await _userService.GetByIdAsync(user.Id);
-
             return View(userInfo);
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateProfil(UpdateUserDto  dto)
+        public async Task<IActionResult> UpdateProfil(UpdateUserDto dto)
         {
-
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
             var user = await _userManager.FindByNameAsync(User.Identity.Name);
 
-            bool passwordCheck = await _userManager.CheckPasswordAsync(user,dto.CurrentPassword);
+            // 1. Şifre Kontrolü (Kritik Güvenlik Adımı)
+            bool passwordCheck = await _userManager.CheckPasswordAsync(user, dto.CurrentPassword);
 
-            if(!passwordCheck)
+            if (!passwordCheck)
             {
-                // GÜVENLİK UYARISI: Şifresini yanlış giren biri var
-                _logger.LogWarning("Güvenlik Uyarısı: {UserEmail} adlı kullanıcı profilini güncellemeye çalışırken mevcut şifresini HATALI girdi.", user.Email);
+                // GÜVENLİK UYARISI: Şifresini yanlış giren biri var (Brute force veya saldırı olabilir)
+                _logger.LogWarning("🛑 PROFİL GÜNCELLEME HATASI: {UserEmail} mevcut şifresini YANLIŞ girdi. IP: {Ip}", user.Email, ipAddress);
 
-                ModelState.AddModelError("", "Şifreniz hatalı lütfen kontrol ediniz");
+                ModelState.AddModelError("", "Mevcut şifreniz hatalı, lütfen kontrol ediniz.");
                 return View(dto);
             }
 
+            // 2. Dosya Yükleme İşlemi
             if (dto.ImageFile is not null)
             {
-                // 1. Gelen dosyanın uzantısını alıp küçük harfe çeviriyoruz
                 var extension = Path.GetExtension(dto.ImageFile.FileName).ToLowerInvariant();
-
-                // 2. İzin verdiğimiz uzantıların bir listesi
                 var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
 
-                // 3. Eğer gelen uzantı bizim listede yoksa işlemi durdur ve hata dön
+                // Dosya Uzantı Kontrolü
                 if (!allowedExtensions.Contains(extension))
                 {
-                    // ŞÜPHELİ DOSYA LOGU
-                    _logger.LogWarning("Sistem Uyarısı: {UserEmail} adlı kullanıcı yasaklı bir dosya uzantısı ({Extension}) yüklemeye çalıştı!", user.Email, extension);
+                    // ŞÜPHELİ DOSYA LOGU (Shell Upload girişimi olabilir)
+                    _logger.LogWarning("⚠️ YASAKLI DOSYA: {UserEmail} yasaklı uzantı ({Extension}) yüklemeye çalıştı! IP: {Ip}", user.Email, extension, ipAddress);
 
                     ModelState.AddModelError(string.Empty, "Lütfen sadece resim formatında (.jpg, .jpeg, .png, .gif) bir dosya seçin!");
                     return View(dto);
                 }
 
-                // Uzantı sorunsuzsa normal kayıt işlemine devam ediyoruz
-                var currentDirectory = Directory.GetCurrentDirectory();
-                var saveDirectory = Path.Combine(currentDirectory, "wwwroot", "UserImagess");
-
-                if (!Directory.Exists(saveDirectory))
+                try
                 {
-                    Directory.CreateDirectory(saveDirectory);
+                    string uploadsFolder = Path.Combine(_hostEnvironment.WebRootPath, "UserImagess");
+                    if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+
+                    string uniqueFileName = Guid.NewGuid() + extension;
+                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await dto.ImageFile.CopyToAsync(fileStream);
+                    }
+
+                    dto.ImageUrl = "/UserImagess/" + uniqueFileName;
+
+                    _logger.LogInformation("📸 FOTOĞRAF GÜNCELLENDİ: {UserEmail} yeni profil resmi yükledi. Dosya: {FileName}", user.Email, uniqueFileName);
                 }
-
-                var ImageName = Guid.NewGuid() + extension;
-                var saveLocation = Path.Combine(saveDirectory, ImageName);
-
-                using var stream = new FileStream(saveLocation, FileMode.Create);
-                await dto.ImageFile.CopyToAsync(stream);
-
-                dto.ImageUrl = "/UserImagess/" + ImageName;
-                // DOSYA YÜKLEME LOGU
-                _logger.LogInformation("Sistem İşlemi: {UserEmail} adlı kullanıcı profil resmini başarıyla güncelledi. Yeni Dosya: {ImageName}", user.Email, ImageName);
-
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "🔥 DOSYA YÜKLEME HATASI: {UserEmail} resim yüklerken sistem hatası oluştu.", user.Email);
+                    ModelState.AddModelError("", "Resim yüklenirken bir hata oluştu.");
+                    return View(dto);
+                }
+            }
+            else
+            {
+                // Eğer yeni resim yüklenmediyse, eski resim yolunu korumak gerekebilir.
+                // Servis katmanınız bunu hallediyorsa sorun yok, ancak DTO'da ImageUrl null giderse eski resmi silebilir.
+                // Buraya dikkat etmek gerekir. Genelde HiddenInput ile eski URL taşınır.
             }
 
-
             // BAŞARILI GÜNCELLEME LOGU
-            _logger.LogInformation("Sistem İşlemi: {UserEmail} adlı kullanıcı profil bilgilerini başarıyla güncelledi.", user.Email);
-
             await _userService.UpdateAsync(dto);
+
+            _logger.LogInformation("✅ PROFİL GÜNCELLENDİ: {UserEmail} bilgilerini değiştirdi. IP: {Ip}", user.Email, ipAddress);
 
             ViewBag.IsSuccess = true;
             return View(dto);
-
         }
 
         public async Task<IActionResult> ChangePassword()
         {
             var user = await _userManager.FindByNameAsync(User.Identity.Name);
-
-            ViewBag.name = user.Name + "" + user.Surname;
+            ViewBag.name = user.Name + " " + user.Surname;
             ViewBag.job = user.Job;
-
-
             return View();
         }
-
 
         [HttpPost]
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         {
-
-            if(!ModelState.IsValid)
-            {
-                return View(model);
-            }
+            if (!ModelState.IsValid) return View(model);
 
             var user = await _userManager.FindByNameAsync(User.Identity.Name);
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
 
             var result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
 
-            if(!result.Succeeded)
+            if (!result.Succeeded)
             {
-                foreach(var error in result.Errors)
+                foreach (var error in result.Errors)
                 {
-                    // Identity'nin "Eski şifre yanlış" hatasını yakalıyoruz
                     if (error.Code == "PasswordMismatch")
                     {
                         // ŞİFRE DEĞİŞTİRME HATASI LOGU
-                        _logger.LogWarning("Güvenlik Uyarısı: {UserEmail} kullanıcısı şifresini değiştirmeye çalıştı ancak mevcut şifresini yanlış girdi.", user.Email);
+                        _logger.LogWarning("🛑 ŞİFRE DEĞİŞİM HATASI: {UserEmail} mevcut şifresini yanlış girdiği için reddedildi. IP: {Ip}", user.Email, ipAddress);
                         ModelState.AddModelError(string.Empty, "Mevcut şifrenizi yanlış girdiniz.");
                     }
                     else
                     {
-                        _logger.LogWarning("Sistem Uyarısı: {UserEmail} kullanıcısının şifre değişimi kural hatası nedeniyle başarısız oldu: {ErrorCode}", user.Email, error.Code);
-                        // Diğer olası Identity hatalarını olduğu gibi basıyoruz
+                        // Şifre politikasına uymama vb. durumlar
+                        _logger.LogWarning("⚠️ ŞİFRE POLİTİKASI: {UserEmail} şifre değiştirirken hata aldı: {ErrorCode} - {Desc}", user.Email, error.Code, error.Description);
                         ModelState.AddModelError(error.Code, error.Description);
                     }
                 }
@@ -148,15 +148,13 @@ namespace NotikaEmail_Identity.Controllers
             }
 
             // KRİTİK LOG: Şifre değişti!
-            _logger.LogInformation("Sistem İşlemi: {UserEmail} adlı kullanıcı şifresini başarıyla DEĞİŞTİRDİ. Oturum kapatılıyor.", user.Email);
+            // Security Stamp güncellemek, kullanıcının diğer cihazlardaki oturumlarını düşürür (Güvenlik için iyidir).
+            await _userManager.UpdateSecurityStampAsync(user);
+
+            _logger.LogInformation("🔐 ŞİFRE DEĞİŞTİRİLDİ: {UserEmail} şifresini başarıyla güncelledi. IP: {Ip}. Oturum kapatılıyor.", user.Email, ipAddress);
+
             await _signInManager.SignOutAsync();
-
             return RedirectToAction("SignIn", "Login");
-
         }
-
-
-
-
     }
 }

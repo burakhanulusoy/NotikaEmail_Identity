@@ -14,12 +14,19 @@ namespace NotikaEmail_Identity.Repositories.MessageRepositories
 
         public async Task CloseModifiedForUpdate(Message message)
         {
-            _context.Update(message);
+            var existingEntity = await _context.Messages.FindAsync(message.Id);
 
-            _context.Entry(message).Property(x => x.SendDate).IsModified = false;
+            
+                // 2. Mapper'dan gelen yeni değerleri, veritabanındaki nesnenin üzerine "giydirelim"
+                _context.Entry(existingEntity).CurrentValues.SetValues(message);
 
-            await _context.SaveChangesAsync();
+                // 3. SendDate'in değişmesini istemediğin kuralı burada işletelim
+                _context.Entry(existingEntity).Property(x => x.SendDate).IsModified = false;
 
+                // 4. Değişiklikleri kaydedelim
+                await _context.SaveChangesAsync();
+           
+          
         }
 
         public async Task<List<Message>> GetAllByCategoryAndAppUserAsync()
@@ -65,7 +72,6 @@ namespace NotikaEmail_Identity.Repositories.MessageRepositories
                                .Include(x => x.Sender)
                                .Include(x => x.Receiver)
                                .Where(filter)
-                               .Where(x=>x.IsDeleted==false)
                                .Where(x=>x.IsDraft==false)
                                .OrderByDescending(x=>x.Id)
                                .ToListAsync();
@@ -86,11 +92,12 @@ namespace NotikaEmail_Identity.Repositories.MessageRepositories
 
         }
 
-        public async Task<List<Message>> GetAllSpamAsync()
+        public async Task<List<Message>> GetAllSpamAsync(int id)
         {
             return await _table.Include(x => x.Category)
                                  .Include(x => x.Sender)
                                  .Include(x => x.Receiver)
+                                 .Where(x=>x.ReceiverId==id)
                                  .Where(x => x.IsDraft == false)
                                  .Where(x => x.IsDeleted == false)
                                  .Where(x => x.IsSpam == true)

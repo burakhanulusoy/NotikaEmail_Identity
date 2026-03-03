@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 
 namespace NotikaEmail_Identity.Controllers
 {
-    // LOG DÜZELTMESİ: DefaultController yerine ForgotPasswordController yapıldı.
     public class ForgotPasswordController(UserManager<AppUser> _userManager, ILogger<ForgotPasswordController> _logger) : Controller
     {
         public IActionResult ForgetMyPassword()
@@ -19,20 +18,27 @@ namespace NotikaEmail_Identity.Controllers
         [HttpPost]
         public async Task<IActionResult> ForgetMyPassword(ForgetPasswordViewModel model)
         {
-            _logger.LogInformation("Şifre Sıfırlama Talebi: {Email} adresi için süreç başlatıldı.", model.Email);
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+
+            _logger.LogInformation("🔑 ŞİFRE SIFIRLAMA TALEBİ: '{Email}' adresi için süreç başlatıldı. IP: {Ip}", model.Email, ipAddress);
 
             var user = await _userManager.FindByEmailAsync(model.Email);
 
             if (user == null)
             {
-                _logger.LogWarning("Güvenlik: Sistemde {Email} adresine ait kullanıcı bulunamadı.", model.Email);
+                // Güvenlik: Kullanıcıya "Böyle biri yok" demek yerine sessizce hata dönüyoruz ama LOGLUYORUZ.
+                // Bu sayede "User Enumeration" saldırılarını takip edebiliriz.
+                _logger.LogWarning("⚠️ GEÇERSİZ E-POSTA: Sistemde kayıtlı olmayan '{Email}' adresi için şifre sıfırlama istendi. IP: {Ip}", model.Email, ipAddress);
+
+                // Kullanıcıya yine de "Mail gönderildi" diyebiliriz (Güvenlik için) veya "Bulunamadı" diyebiliriz.
                 ModelState.AddModelError("", "Bu email adresine ait bir kullanıcı bulunamadı.");
                 return View(model);
             }
 
             string passwordResetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-            _logger.LogInformation("Token Üretildi: {Email} için token: {Token}", model.Email, passwordResetToken);
+            // Token'ı loglamak güvenlik riski olabilir ama debug için ilk 10 karakterini loglayalım.
+            _logger.LogDebug("🎟️ TOKEN ÜRETİLDİ: {Email} için token oluşturuldu. (Token başı: {TokenStart}...) ", model.Email, passwordResetToken.Substring(0, 10));
 
             var passwordResetTokenLink = Url.Action("ResetPassword", "ForgotPassword", new
             {
@@ -40,36 +46,57 @@ namespace NotikaEmail_Identity.Controllers
                 token = passwordResetToken,
             }, HttpContext.Request.Scheme);
 
-            MimeMessage mimeMessage = new MimeMessage();
-            MailboxAddress mailboxAddressFrom = new MailboxAddress("NotikaApp", "burakhanulusoy18@gmail.com");
-            mimeMessage.From.Add(mailboxAddressFrom);
 
-            MailboxAddress mailboxAddressTo = new MailboxAddress("User", model.Email);
-            mimeMessage.To.Add(mailboxAddressTo);
+            // --- MAIL GÖNDERME İŞLEMİ (Hata yakalama eklendi) ---
+            try
+            {
+                MimeMessage mimeMessage = new MimeMessage();
+                MailboxAddress mailboxAddressFrom = new MailboxAddress("NotikaApp", "burakhanulusoy18@gmail.com");
+                mimeMessage.From.Add(mailboxAddressFrom);
 
-            var bodybuilder = new BodyBuilder();
-            bodybuilder.TextBody = passwordResetTokenLink;
+                MailboxAddress mailboxAddressTo = new MailboxAddress("User", model.Email);
+                mimeMessage.To.Add(mailboxAddressTo);
 
-            mimeMessage.Body = bodybuilder.ToMessageBody();
-            mimeMessage.Subject = "Şifre Değişiklik talebi";
+                var bodybuilder = new BodyBuilder();
+                bodybuilder.TextBody = $"Şifrenizi sıfırlamak için tıklayınız: {passwordResetTokenLink}";
+                // Linki HTML olarak göndermek daha şık olur ama TextBody de çalışır.
 
-            SmtpClient client = new SmtpClient();
-            client.Connect("smtp.gmail.com", 587, false);
-            client.Authenticate("burakhanulusoy18@gmail.com", "xhbicuiuxaffpwmz");
-            client.Send(mimeMessage);
-            client.Disconnect(true);
+                mimeMessage.Body = bodybuilder.ToMessageBody();
+                mimeMessage.Subject = "NotikaApp - Şifre Sıfırlama Talebi";
 
-            _logger.LogInformation("Mail Gönderildi: {Email} adresine link başarıyla iletildi.", model.Email);
+                using (SmtpClient client = new SmtpClient())
+                {
+                    client.Connect("smtp.gmail.com", 587, false);
+                    client.Authenticate("burakhanulusoy18@gmail.com", "xhbicuiuxaffpwmz");
+                    client.Send(mimeMessage);
+                    client.Disconnect(true);
+                }
 
-            ViewBag.SuccessMessage = "Şifre sıfırlama bağlantısı başarıyla gönderildi.";
+                _logger.LogInformation("✉️ MAİL GÖNDERİLDİ: {Email} adresine sıfırlama linki başarıyla iletildi.", model.Email);
+                ViewBag.SuccessMessage = "Şifre sıfırlama bağlantısı e-posta adresinize gönderildi.";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical(ex, "🔥 MAİL HATASI: {Email} adresine mail atarken SMTP sunucusu hata verdi!", model.Email);
+                ModelState.AddModelError("", "Mail gönderiminde bir hata oluştu. Lütfen daha sonra tekrar deneyiniz.");
+                return View(model);
+            }
+            // -----------------------------------------------------
 
             return View();
         }
 
         public IActionResult ResetPassword(string userId, string token)
         {
-            _logger.LogInformation("Linke Tıklandı: UserId {UserId} olan kullanıcı şifre ekranını açtı.", userId);
+            if (userId == null || token == null)
+            {
+                _logger.LogWarning("🚫 HATALI LİNK: Kullanıcı geçersiz veya eksik parametreli bir linke tıkladı.");
+                return RedirectToAction("SignIn", "Login");
+            }
 
+            _logger.LogInformation("🔗 LİNKE TIKLANDI: Kullanıcı (ID: {UserId}) şifre belirleme ekranını açtı.", userId);
+
+            // TempData veriyi bir sonraki Request'e taşır.
             TempData["userId"] = userId;
             TempData["token"] = token;
 
@@ -79,13 +106,15 @@ namespace NotikaEmail_Identity.Controllers
         [HttpPost]
         public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
         {
+            // TempData okunduğunda silinir, tekrar okumak için Keep yapmak gerekebilir ama burada değişkene atıyoruz.
             var userId = TempData["userId"];
             var token = TempData["token"];
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
 
             if (userId is null || token is null)
             {
-                _logger.LogWarning("Hata: TempData içerisindeki UserId veya Token kayıp.");
-                ModelState.AddModelError("", "Bağlantı süresi dolmuş veya geçersiz. Lütfen tekrar mail isteyin.");
+                _logger.LogWarning("⌛ OTURUM ZAMAN AŞIMI: TempData kayboldu. Kullanıcı sayfada çok uzun süre beklemiş olabilir. IP: {Ip}", ipAddress);
+                ModelState.AddModelError("", "Bağlantı süresi dolmuş veya sayfa yenilenmiş. Lütfen tekrar mail talep edin.");
                 return View(model);
             }
 
@@ -93,7 +122,7 @@ namespace NotikaEmail_Identity.Controllers
 
             if (user == null)
             {
-                _logger.LogWarning("Hata: Şifresi değiştirilecek kullanıcı (ID: {UserId}) bulunamadı.", userId);
+                _logger.LogError("❌ KRİTİK HATA: ID: {UserId} olan kullanıcı veritabanında bulunamadı!", userId);
                 ModelState.AddModelError("", "Kullanıcı bulunamadı.");
                 return View(model);
             }
@@ -102,27 +131,34 @@ namespace NotikaEmail_Identity.Controllers
 
             if (!result.Succeeded)
             {
-                _logger.LogWarning("Başarısız: {Email} şifresini güncelleyemedi.", user.Email);
+                // Hataları tek bir string'de birleştirip logluyoruz
+                string errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                _logger.LogWarning("⚠️ SIFIRLAMA BAŞARISIZ: {Email} şifre değiştirirken hata aldı. Sebepler: {Errors}", user.Email, errors);
 
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(error.Code, error.Description);
                 }
 
+                // Hata durumunda TempData silinmesin diye koruyoruz
                 TempData.Keep("userId");
                 TempData.Keep("token");
 
                 return View(model);
             }
 
-            // --- ROL EKLEME KISMI ---
-            // Eğer rolü yoksa ekler, varsa hata vermez pas geçer. UpdateAsync'e gerek yoktur.
-            await _userManager.AddToRoleAsync(user, "User");
-            _logger.LogInformation("Rol Ataması: {Email} adlı kullanıcıya 'User' rolü eklendi.", user.Email);
-            // ------------------------
+            // --- ROL GÜNCELLEME (Opsiyonel) ---
+            // Şifresini sıfırlayan kullanıcıyı aktif kabul edip rolünü garantiye alıyoruz.
+            if (!await _userManager.IsInRoleAsync(user, "User"))
+            {
+                await _userManager.AddToRoleAsync(user, "User");
+                _logger.LogInformation("🛡️ ROL GÜNCELLENDİ: {Email} kullanıcısına 'User' rolü tanımlandı.", user.Email);
+            }
 
-            _logger.LogInformation("Başarılı: {Email} şifresini başarıyla değiştirdi.", user.Email);
-            ViewBag.SuccessMessage = "Şifreniz başarıyla güncellendi. Giriş sayfasına yönlendiriliyorsunuz...";
+            _logger.LogInformation("✅ ŞİFRE DEĞİŞTİ: {Email} şifresini başarıyla güncelledi. IP: {Ip}", user.Email, ipAddress);
+
+            // Kullanıcıya bilgi verip Login'e atıyoruz
+            TempData["SuccessMessage"] = "Şifreniz başarıyla güncellendi. Giriş yapabilirsiniz."; // Login sayfasında göstermek için
 
             return RedirectToAction("SignIn", "Login");
         }

@@ -70,9 +70,9 @@ namespace NotikaEmail_Identity.Services.MessageServices
 
         }
 
-        public async Task<List<ResultMessageDto>> GetAllSpamAsync()
+        public async Task<List<ResultMessageDto>> GetAllSpamAsync(int id)
         {
-            var messages=await _messageRepository.GetAllSpamAsync();
+            var messages=await _messageRepository.GetAllSpamAsync(id);
             return _mapper.Map<List<ResultMessageDto>>(messages);
         }
 

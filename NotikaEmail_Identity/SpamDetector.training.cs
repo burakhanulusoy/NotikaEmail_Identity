@@ -93,7 +93,7 @@ namespace NotikaEmail_Identity
             var pipeline = mlContext.Transforms.Text.FeaturizeText(inputColumnName:@"Message",outputColumnName:@"Message")      
                                     .Append(mlContext.Transforms.Concatenate(@"Features", new []{@"Message"}))      
                                     .Append(mlContext.Transforms.Conversion.MapValueToKey(outputColumnName:@"Label",inputColumnName:@"Label",addKeyValueAnnotationsAsText:false))      
-                                    .Append(mlContext.MulticlassClassification.Trainers.OneVersusAll(binaryEstimator:mlContext.BinaryClassification.Trainers.FastForest(new FastForestBinaryTrainer.Options(){NumberOfTrees=4,NumberOfLeaves=4,FeatureFraction=1F,LabelColumnName=@"Label",FeatureColumnName=@"Features"}),labelColumnName:@"Label"))      
+                                    .Append(mlContext.MulticlassClassification.Trainers.OneVersusAll(binaryEstimator:mlContext.BinaryClassification.Trainers.FastTree(new FastTreeBinaryTrainer.Options(){NumberOfLeaves=9,MinimumExampleCountPerLeaf=15,NumberOfTrees=6,MaximumBinCountPerFeature=231,FeatureFraction=0.99999999,LearningRate=0.6062423092351582,LabelColumnName=@"Label",FeatureColumnName=@"Features",DiskTranspose=false}),labelColumnName: @"Label"))      
                                     .Append(mlContext.Transforms.Conversion.MapKeyToValue(outputColumnName:@"PredictedLabel",inputColumnName:@"PredictedLabel"));
 
             return pipeline;

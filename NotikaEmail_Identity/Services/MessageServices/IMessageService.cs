@@ -39,7 +39,7 @@ namespace NotikaEmail_Identity.Services.MessageServices
 
         Task<UpdateMessageDto> GetByIdMessageForDraftAsync(int id);
 
-        Task<List<ResultMessageDto>> GetAllSpamAsync();
+        Task<List<ResultMessageDto>> GetAllSpamAsync(int id);
 
     }
 }

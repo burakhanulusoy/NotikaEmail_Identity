@@ -4,15 +4,9 @@ using NotikaEmail_Identity.Entities;
 using NotikaEmail_Identity.Models;
 using NotikaEmail_Identity.Services.SendEmailServices;
 
-
-
-
-
-
-
 namespace NotikaEmail_Identity.Controllers
 {
-    public class RegisterController(UserManager<AppUser> _userManger ,
+    public class RegisterController(UserManager<AppUser> _userManager,
         ISendEmail _sendEmail,
         ILogger<RegisterController> _logger) : Controller
     {
@@ -21,27 +15,24 @@ namespace NotikaEmail_Identity.Controllers
             return View();
         }
 
-
         [HttpPost]
         public async Task<IActionResult> SignUp(RegisterUserViewModel model)
         {
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
 
-            
-
-            if(model.Password != model.ConfirmPassword)
+            // 1. Şifre Eşleşme Kontrolü
+            if (model.Password != model.ConfirmPassword)
             {
-                // LOG: Şifre uyuşmazlığı (Potansiyel hatalı giriş veya bot denemesi)
-                _logger.LogWarning("Kayıt Denemesi Başarısız: {UserEmail} adresi için girilen şifreler birbiriyle uyuşmuyor.", model.Email);
+                // LOG: Basit kullanıcı hatası veya bot denemesi
+                _logger.LogWarning("⚠️ KAYIT BAŞARISIZ (Şifre Uyumsuz): {UserEmail} için girilen şifreler uyuşmuyor. IP: {Ip}", model.Email, ipAddress);
 
-                ModelState.AddModelError("", "Lütfen şifreleri aynı girin.");
+                ModelState.AddModelError("", "Girdiğiniz şifreler birbiriyle uyuşmuyor.");
                 return View(model);
             }
 
+            Random rnd = new Random();
+            int activationCode = rnd.Next(100000, 999999);
 
-            Random rnd=new Random();
-            int activationCode = rnd.Next(100000,999999);
-
-            //yapma nedenim create user içine appuser türünde istiyor!!!
             var user = new AppUser()
             {
                 Email = model.Email,
@@ -50,54 +41,58 @@ namespace NotikaEmail_Identity.Controllers
                 Surname = model.Surname,
                 CreatedDate = DateTime.Now,
                 Job = "Belirtilmemiş",
-                AboutMe="Belirtilmemiş",
-                ActivationCode=activationCode
-
+                AboutMe = "Belirtilmemiş",
+                ActivationCode = activationCode,
+                EmailConfirmed = false // Açıkça belirtmekte fayda var
             };
 
-            var result = await _userManger.CreateAsync(user, model.Password);
+            // 2. Kullanıcı Oluşturma (Identity)
+            var result = await _userManager.CreateAsync(user, model.Password);
 
-            if(!result.Succeeded)
+            if (!result.Succeeded)
             {
-                // LOG: Identity kurallarına takılan kayıt denemesi (Şifre zayıf olabilir, mail zaten vardır vb.)
-                _logger.LogWarning("Sistem Uyarısı: {UserEmail} için yeni kullanıcı kaydı oluşturulamadı. Hata Sayısı: {ErrorCount}",
-                    model.Email, result.Errors.Count());
+                // Hataları birleştirip tek satırda logluyoruz ki okuması kolay olsun
+                string errors = string.Join(", ", result.Errors.Select(e => e.Description));
+
+                _logger.LogWarning("🛑 KAYIT HATASI (Identity): {UserEmail} oluşturulamadı. Hatalar: {Errors} | IP: {Ip}", model.Email, errors, ipAddress);
 
                 foreach (var item in result.Errors)
                 {
-
                     ModelState.AddModelError("", item.Description);
                 }
                 return View(model);
             }
 
-            // LOG: Efsanevi Başarı Logu!
-            _logger.LogInformation("Sistem İşlemi: Yeni bir kullanıcı başarıyla sisteme kayıt oldu. Kullanıcı: {UserName} ({UserEmail}). Aktivasyon kodu gönderiliyor.",
-                user.UserName, user.Email);
+            // 3. Rol Atama
+            var roleResult = await _userManager.AddToRoleAsync(user, "User");
+            if (!roleResult.Succeeded)
+            {
+                _logger.LogError("🔥 ROL HATASI: {UserEmail} oluşturuldu ancak 'User' rolü atanamadı! IP: {Ip}", user.Email, ipAddress);
+                // Burada işlemi durdurmuyoruz, kullanıcı oluştu ama yetkisi yok. Admin panelinden düzeltilebilir.
+            }
 
-            await _userManger.AddToRoleAsync(user, "User");
+            // BAŞARILI DB KAYDI LOGU
+            _logger.LogInformation("✅ YENİ ÜYE KAYDI: {UserEmail} ({UserName}) sisteme eklendi. IP: {Ip}", user.Email, user.UserName, ipAddress);
 
+            // 4. Aktivasyon Maili Gönderme
             try
             {
                 _sendEmail.SendEmail(user.Email, activationCode);
-                _logger.LogInformation("Bilgi: {UserEmail} adresine aktivasyon kodu ({Code}) başarıyla mail atıldı.", user.Email, activationCode);
+
+                _logger.LogInformation("✉️ MAİL GÖNDERİLDİ: {UserEmail} adresine aktivasyon kodu ({Code}) yollandı.", user.Email, activationCode);
             }
             catch (Exception ex)
             {
-                // LOG: Mail sunucusu hatası (Çok kritik!)
-                _logger.LogError(ex, "Sistem Hatası: {UserEmail} adresine aktivasyon maili gönderilirken bir sorun oluştu!", user.Email);
+                // Mail gitmezse kullanıcı giriş yapamaz, bu yüzden bu hata Kritiktir.
+                _logger.LogCritical(ex, "❌ MAİL HATASI: {UserEmail} oluşturuldu ama aktivasyon maili gidemedi! Kod: {Code}", user.Email, activationCode);
+
+                // Kullanıcıya hissettirmemek için veya uyarmak için mesaj ekleyebiliriz
+                // ModelState.AddModelError("", "Kayıt oldunuz ancak aktivasyon maili gönderilemedi. Lütfen destekle iletişime geçin.");
             }
 
             TempData["EmailMove"] = model.Email;
 
             return RedirectToAction("UserActivation", "Activation");
-            
-
-
         }
-
-
-
-
     }
 }

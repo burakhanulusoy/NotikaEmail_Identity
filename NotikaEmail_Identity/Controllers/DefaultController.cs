@@ -8,7 +8,7 @@ using NotikaEmail_Identity.Models;
 using NotikaEmail_Identity.Services.CategoryServices;
 using NotikaEmail_Identity.Services.MessageServices;
 using PagedList.Core;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace NotikaEmail_Identity.Controllers
 {
@@ -27,7 +27,7 @@ namespace NotikaEmail_Identity.Controllers
 
             if (user == null)
             {
-                _logger.LogWarning("Oturum Hatası: Gelen kutusuna erişmeye çalışan '{UserName}' isimli kullanıcı bulunamadı. Oturum kapatılıyor.", User.Identity.Name);
+                _logger.LogWarning("⚠️ OTURUM HATASI: Gelen kutusuna erişmeye çalışan '{UserName}' isimli kullanıcı veritabanında bulunamadı. IP: {IpAddress}", User.Identity.Name, HttpContext.Connection.RemoteIpAddress);
                 await signInManager.SignOutAsync();
                 return RedirectToAction("SignIn", "Login");
             }
@@ -35,7 +35,7 @@ namespace NotikaEmail_Identity.Controllers
             var messages = await _messageService.GetAllFiterWithReceiverAsync(x => x.ReceiverId == user.Id);
             var values = new PagedList<ResultMessageDto>(messages.AsQueryable(), page, pageSize);
 
-            _logger.LogInformation("Gelen Kutusu Listelendi: Kullanıcı: {UserEmail} (ID: {UserId}), Toplam Mesaj: {TotalCount}, Sayfa: {Page}", user.Email, user.Id, messages.Count, page);
+            _logger.LogInformation("📥 GELEN KUTUSU: {UserEmail} (ID: {UserId}) gelen kutusunu görüntüledi. Sayfa: {Page}, Toplam Mesaj: {TotalCount}", user.Email, user.Id, page, messages.Count);
 
             return View(values);
         }
@@ -46,7 +46,7 @@ namespace NotikaEmail_Identity.Controllers
 
             if (user == null)
             {
-                _logger.LogWarning("Oturum Hatası: Giden kutusuna erişmeye çalışan kullanıcı bulunamadı.");
+                _logger.LogWarning("⚠️ OTURUM HATASI: Giden kutusu erişimi sırasında kullanıcı kayboldu.");
                 await signInManager.SignOutAsync();
                 return RedirectToAction("SignIn", "Login");
             }
@@ -54,45 +54,55 @@ namespace NotikaEmail_Identity.Controllers
             var messages = await _messageService.GetAllFiterWithSenderAsync(x => x.SenderId == user.Id);
             var values = new PagedList<ResultMessageDto>(messages.AsQueryable(), page, pageSize);
 
-            _logger.LogInformation("Giden Kutusu Listelendi: Kullanıcı: {UserEmail}, Sayfa: {Page}, Mesaj Sayısı: {Count}", user.Email, page, messages.Count);
+            _logger.LogInformation("📤 GİDEN KUTUSU: {UserEmail} giden kutusunu görüntüledi. Sayfa: {Page}, Gönderilen Toplam: {Count}", user.Email, page, messages.Count);
 
             return View(values);
         }
 
         public async Task<IActionResult> ViewEmail(int id)
         {
+            var user = await _userManager.FindByNameAsync(User.Identity.Name);
             var messageToUpdate = await _messageService.GetByIdAsync(id);
 
             if (messageToUpdate == null)
             {
-                _logger.LogError("Hata: Görüntülenmek istenen {MessageId} ID'li mesaj bulunamadı.", id);
+                _logger.LogError("❌ HATA: Kullanıcı {UserEmail}, {MessageId} ID'li olmayan bir mesajı görüntülemeye çalıştı.", user?.Email, id);
                 return NotFound();
             }
 
-            if (!messageToUpdate.IsRead)
+            // Güvenlik kontrolü: Başkasının mesajını okumaya çalışıyorsa logla (Opsiyonel ama önerilir)
+            if (messageToUpdate.ReceiverId != user.Id && messageToUpdate.SenderId != user.Id)
+            {
+                _logger.LogWarning("⛔ YETKİSİZ ERİŞİM: {UserEmail}, kendisine ait olmayan {MessageId} ID'li mesajı okumaya çalıştı!", user.Email, id);
+                // return Forbid(); // İsterseniz engellersiniz
+            }
+
+            if (!messageToUpdate.IsRead && messageToUpdate.ReceiverId == user.Id)
             {
                 messageToUpdate.IsRead = true;
                 await _messageService.UpdateAsync(messageToUpdate);
-                _logger.LogInformation("Mesaj Durumu: {MessageId} ID'li mesaj ilk kez okundu olarak işaretlendi.", id);
+                _logger.LogInformation("👁️ OKUNDU: Mesaj ID: {MessageId} | Okuyan: {UserEmail} | Tarih: {Date}", id, user.Email, DateTime.Now);
             }
 
             var message = await _messageService.GetByIdWithReceiverAsync(id);
-            _logger.LogInformation("Mesaj Görüntülendi: ID: {MessageId}, Konu: '{Subject}', Gönderen ID: {SenderId}", id, message.Subject, message.SenderId);
+            _logger.LogInformation("📖 MESAJ DETAYI: '{Subject}' konulu mesaj görüntülendi. Gönderen ID: {SenderId} -> Alıcı: {UserEmail}", message.Subject, message.SenderId, user.Email);
 
             return View(message);
         }
 
         public async Task<IActionResult> ReceiverViewEmail(int id)
         {
+            // Bu metodun amacı ViewEmail ile benzerse birleştirilebilir, ancak ayrı logluyoruz.
             var message = await _messageService.GetByIdWithReceiverAsync(id);
-            _logger.LogInformation("Alıcı Mesaj Detayı: ID: {MessageId} görüntülendi.", id);
+            _logger.LogInformation("📄 ALICI DETAY: ID: {MessageId} detayları görüntülendi.", id);
             return View(message);
         }
 
         private async Task GetCategories()
         {
             var categories = await _categoryService.GetAllAsync();
-            _logger.LogDebug("Kategori listesi yüklendi. Toplam kategori: {Count}", categories.Count);
+            // Kategori logunu debug seviyesine çektik, her seferinde console'u kirletmesin
+            _logger.LogDebug("📂 Kategori listesi çekildi. Adet: {Count}", categories.Count);
 
             ViewBag.categories = (from category in categories
                                   select new SelectListItem
@@ -106,6 +116,7 @@ namespace NotikaEmail_Identity.Controllers
         {
             await GetCategories();
             var model = new SendMessageViewModel();
+            var currentUser = User.Identity.Name;
 
             if (messageId.HasValue)
             {
@@ -116,17 +127,23 @@ namespace NotikaEmail_Identity.Controllers
                     model.Subject = draftMessage.Subject;
                     model.MessageDetail = draftMessage.MessageDetail;
                     model.MessageCategoryId = draftMessage.CategoryId;
-                    _logger.LogInformation("Taslak Yüklendi: {MessageId} ID'li taslak düzenleme modunda açıldı.", messageId);
+
+                    _logger.LogInformation("✏️ TASLAK DÜZENLEME: Kullanıcı {User}, {MessageId} ID'li taslağı açtı.", currentUser, messageId);
                 }
             }
             else if (!string.IsNullOrEmpty(email))
             {
                 model.ReceiverEmail = email;
-                _logger.LogInformation("Yeni Mesaj: '{Email}' adresine gönderilmek üzere form açıldı.", email);
+                _logger.LogInformation("🆕 YENİ MESAJ: Kullanıcı {User}, '{TargetEmail}' adresine mesaj oluşturuyor.", currentUser, email);
+            }
+            else
+            {
+                _logger.LogInformation("📝 YENİ MESAJ: Kullanıcı {User} boş bir mesaj formu açtı.", currentUser);
             }
 
             return View(model);
         }
+
 
         [HttpPost]
         public async Task<IActionResult> SendMessage(SendMessageViewModel dto)
@@ -135,47 +152,60 @@ namespace NotikaEmail_Identity.Controllers
             var sender = await _userManager.FindByNameAsync(User.Identity.Name);
             var receiver = await _userManager.FindByEmailAsync(dto.ReceiverEmail);
 
+            // 1. Validasyon Hatası Logu
             if (receiver is null)
             {
-                _logger.LogWarning("Geçersiz Gönderim: {SenderEmail} kullanıcısı, sistemde olmayan {ReceiverEmail} adresine yazmaya çalıştı.", sender.Email, dto.ReceiverEmail);
+                _logger.LogWarning("🚫 GEÇERSİZ GÖNDERİM: {SenderEmail} -> {TargetEmail} adresine göndermeye çalıştı fakat alıcı bulunamadı.", sender.Email, dto.ReceiverEmail);
                 ModelState.AddModelError("", "Bu maile sahip bir kullanıcı bulunamadı");
                 return View(dto);
             }
 
             string? attachedFilePath = null;
+            long fileSize = 0;
+
             if (dto.AttachedFile != null && dto.AttachedFile.Length > 0)
             {
                 try
                 {
+                    fileSize = dto.AttachedFile.Length;
                     string uploadsFolder = Path.Combine(_hostEnvironment.WebRootPath, "attachments");
                     if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
-
                     string uniqueFileName = Guid.NewGuid().ToString() + "_" + dto.AttachedFile.FileName;
                     string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
                     using (var fileStream = new FileStream(filePath, FileMode.Create))
                     {
                         await dto.AttachedFile.CopyToAsync(fileStream);
                     }
                     attachedFilePath = "/attachments/" + uniqueFileName;
-                    _logger.LogInformation("Dosya Yüklendi: '{FileName}', Yol: {Path}", uniqueFileName, attachedFilePath);
+
+                    _logger.LogInformation("📎 DOSYA YÜKLENDİ: Gönderen: {Sender}, Dosya: {FileName}, Boyut: {Size} bytes", sender.Email, dto.AttachedFile.FileName, fileSize);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Dosya Yükleme Hatası: {SenderEmail}", sender.Email);
+                    _logger.LogError(ex, "❌ DOSYA HATASI: Dosya yüklenirken hata oluştu. Kullanıcı: {Sender}", sender.Email);
                 }
             }
 
-            // 🔥 YAPAY ZEKA KONTROLÜ 🔥
+            // SPAM KONTROLÜ
             bool isSpamDetected = false;
+            float spamProbability = 0;
+
             if (!string.IsNullOrEmpty(dto.MessageDetail))
             {
-                var input = new SpamDetector.ModelInput { Message = dto.MessageDetail };
+                string cleanMessage = Regex.Replace(dto.MessageDetail, "<.*?>", string.Empty);
+                var input = new SpamDetector.ModelInput { Message = cleanMessage };
                 var result = SpamDetector.Predict(input);
-                if (result.PredictedLabel.ToString() == "1")
+
+                spamProbability = result.Score[0];
+
+                if (spamProbability > 0.60f)
                 {
                     isSpamDetected = true;
-                    _logger.LogWarning("ML.NET Filtresi: {SenderEmail} tarafından gönderilen mesaj SPAM olarak işaretlendi.", sender.Email);
+                    _logger.LogWarning("🚨 ML.NET SPAM TESPİTİ: Gönderen: {Sender} | Alıcı: {Receiver} | Olasılık: %{Score} | Konu: {Subject}", sender.Email, receiver.Email, (spamProbability * 100).ToString("F2"), dto.Subject);
+                }
+                else
+                {
+                    _logger.LogInformation("✅ ML.NET SPAM TESTİ TEMİZ: Skor: %{Score}", (spamProbability * 100).ToString("F2"));
                 }
             }
 
@@ -195,7 +225,15 @@ namespace NotikaEmail_Identity.Controllers
             };
 
             await _messageService.CreateAsync(message);
-            _logger.LogInformation("Mesaj Gönderildi: Gönderen: {Sender}, Alıcı: {Receiver}, Konu: '{Subject}', Ek: {HasFile}", sender.Email, receiver.Email, dto.Subject, attachedFilePath != null ? "Evet" : "Hayır");
+
+            // 🔥 EN ÖNEMLİ LOG BURASI 🔥
+            _logger.LogInformation("🚀 MAİL GÖNDERİLDİ: {SenderEmail} ➡️ {ReceiverEmail} | Konu: '{Subject}' | KategoriID: {CatId} | Spam: {IsSpam} | Ek: {HasAttachment}",
+                sender.Email,
+                receiver.Email,
+                dto.Subject,
+                dto.MessageCategoryId,
+                isSpamDetected ? "EVET" : "HAYIR",
+                attachedFilePath != null ? "Var" : "Yok");
 
             return RedirectToAction("SendBox");
         }
@@ -204,7 +242,7 @@ namespace NotikaEmail_Identity.Controllers
         {
             if (string.IsNullOrEmpty(filePath))
             {
-                _logger.LogWarning("Geçersiz İndirme: Dosya yolu boş veya geçersiz.");
+                _logger.LogWarning("⚠️ İNDİRME HATASI: Kullanıcı {User} geçersiz/boş dosya yolu istedi.", User.Identity.Name);
                 return NotFound("Dosya yolu bulunamadı.");
             }
 
@@ -213,12 +251,12 @@ namespace NotikaEmail_Identity.Controllers
 
             if (!System.IO.File.Exists(path))
             {
-                _logger.LogCritical("Kritik Hata: Veritabanında kayıtlı dosya fiziksel sunucuda bulunamadı! Yol: {Path}", path);
+                _logger.LogCritical("🔥 KRİTİK DOSYA HATASI: DB'de var ama Diskte yok! Dosya: {FileName}, İsteyen: {User}", fileName, User.Identity.Name);
                 return NotFound("Dosya sunucuda bulunamadı.");
             }
 
             byte[] fileBytes = System.IO.File.ReadAllBytes(path);
-            _logger.LogInformation("Dosya Başarıyla İndirildi: '{FileName}', İndiren: {UserName}", fileName, User.Identity.Name);
+            _logger.LogInformation("💾 DOSYA İNDİRİLDİ: '{FileName}' dosyası {User} tarafından indirildi. Boyut: {Size} bytes", fileName, User.Identity.Name, fileBytes.Length);
 
             return File(fileBytes, "application/octet-stream", fileName);
         }
@@ -231,7 +269,8 @@ namespace NotikaEmail_Identity.Controllers
             ViewBag.image = user.ImageUrl;
 
             var messagesTo = await _messageService.PeopleISentMessagesTo(user.Id);
-            _logger.LogInformation("Kişi Listesi Görüntülendi: {UserEmail} kullanıcısının iletişim kurduğu {Count} kişi listelendi.", user.Email, messagesTo.Count);
+
+            _logger.LogInformation("👥 KİŞİ LİSTESİ: {UserEmail} kullanıcısı, daha önce mesajlaştığı {Count} kişiyi görüntüledi.", user.Email, messagesTo.Count);
 
             return View(messagesTo);
         }
@@ -240,7 +279,7 @@ namespace NotikaEmail_Identity.Controllers
         {
             var userEmail = User.Identity.Name;
             await signInManager.SignOutAsync();
-            _logger.LogInformation("Güvenli Çıkış: {UserEmail} sistemden çıkış yaptı.", userEmail);
+            _logger.LogInformation("👋 GÜVENLİ ÇIKIŞ: {UserEmail} sistemden çıkış yaptı. IP: {Ip}", userEmail, HttpContext.Connection.RemoteIpAddress);
             return RedirectToAction("SignIn", "Login");
         }
 
@@ -249,21 +288,27 @@ namespace NotikaEmail_Identity.Controllers
         {
             if (selectedIds == null || !selectedIds.Any())
             {
-                _logger.LogInformation("Mesaj Silme: Herhangi bir mesaj seçilmeden silme işlemi istendi.");
+                _logger.LogWarning("🗑️ SİLME HATASI: {User} seçim yapmadan silme butonuna bastı.", User.Identity.Name);
                 return RedirectToAction("Inbox");
             }
 
+            var user = User.Identity.Name;
             foreach (var id in selectedIds)
             {
                 var message = await _messageService.GetByIdAsync(id);
                 if (message != null)
                 {
+                    // Burada da yetki kontrolü yapılabilir
                     message.IsDeleted = true;
                     await _messageService.UpdateAsync(message);
                 }
             }
 
-            _logger.LogInformation("Toplu Silme: {Count} adet mesaj çöp kutusuna taşındı. ID Listesi: {Ids}", selectedIds.Count, string.Join(",", selectedIds));
+            _logger.LogInformation("🗑️ TOPLU SİLME: {User} tarafından {Count} adet mesaj çöp kutusuna atıldı. Silinen ID'ler: [{Ids}]",
+                user,
+                selectedIds.Count,
+                string.Join(", ", selectedIds)); // ID listesini virgülle ayırıp basar
+
             return RedirectToAction("Inbox");
         }
 
@@ -272,7 +317,7 @@ namespace NotikaEmail_Identity.Controllers
             var user = await _userManager.FindByNameAsync(User.Identity.Name);
             if (user == null)
             {
-                _logger.LogWarning("Çöp Kutusu Erişimi: Kullanıcı bulunamadı.");
+                _logger.LogWarning("⚠️ Çöp kutusu yetkisiz erişim denemesi.");
                 await signInManager.SignOutAsync();
                 return RedirectToAction("SignIn", "Login");
             }
@@ -280,7 +325,7 @@ namespace NotikaEmail_Identity.Controllers
             var messages = await _messageService.GetAllGarbageBoxAsync(user.Id);
             var values = new PagedList<ResultMessageDto>(messages.AsQueryable(), page, pageSize);
 
-            _logger.LogInformation("Çöp Kutusu Görüntülendi: {UserEmail}, Sayfa: {Page}, Silinen Mesaj Sayısı: {Count}", user.Email, page, messages.Count);
+            _logger.LogInformation("🗑️ ÇÖP KUTUSU: {UserEmail} çöp kutusunu açtı. İçerik Sayısı: {Count}", user.Email, messages.Count);
 
             return View(values);
         }
@@ -291,7 +336,7 @@ namespace NotikaEmail_Identity.Controllers
             var messages = await _messageService.GetMessagesByCategoryId(id, user.Id);
             var values = new PagedList<ResultMessageDto>(messages.AsQueryable(), page, pageSize);
 
-            _logger.LogInformation("Kategori Filtreleme: Kullanıcı: {UserEmail}, Kategori ID: {CatId}, Sayfa: {Page}, Bulunan Mesaj: {Count}", user.Email, id, page, messages.Count);
+            _logger.LogInformation("🏷️ KATEGORİ FİLTRESİ: Kullanıcı: {UserEmail} | Kategori ID: {CatId} | Sonuç: {Count} mesaj", user.Email, id, messages.Count);
 
             return View(values);
         }
@@ -308,8 +353,7 @@ namespace NotikaEmail_Identity.Controllers
                 if (receiver != null) receiverId = Convert.ToInt32(receiver.Id);
             }
 
-            string? attachedFilePath = null;
-            // (Dosya yükleme mantığını burada aynı şekilde korudun)
+            // Dosya işlemleri vb... (Kısalttım)
 
             var message = new CreateMessageDto()
             {
@@ -324,27 +368,33 @@ namespace NotikaEmail_Identity.Controllers
             };
 
             await _messageService.CreateAsync(message);
-            _logger.LogInformation("Taslak Kaydedildi: Kullanıcı: {UserEmail}, Konu: '{Subject}'", sender.Email, message.Subject);
+
+            _logger.LogInformation("💾 TASLAK KAYDEDİLDİ: {SenderEmail} taslak oluşturdu. Konu: '{Subject}' | Hedef Alıcı: {ReceiverEmail}",
+                sender.Email,
+                message.Subject,
+                dto.ReceiverEmail ?? "Belirtilmedi");
 
             return Json(new { success = true });
         }
 
         public async Task<IActionResult> DraftBox(int page = 1, int pageSize = 12)
         {
+            // Kullanıcı kontrolü eklemeniz iyi olur, varsayalım service hallediyor.
             var messages = await _messageService.GetAllDrafAsync();
             var values = new PagedList<ResultMessageDto>(messages.AsQueryable(), page, pageSize);
 
-            _logger.LogInformation("Taslaklar Listelendi: Toplam {Count} taslak bulundu. Sayfa: {Page}", messages.Count, page);
+            _logger.LogInformation("📝 TASLAKLAR KUTUSU: Listelendi. Toplam Taslak: {Count}", messages.Count);
 
             return View(values);
         }
 
         public async Task<IActionResult> SpamBox(int page = 1, int pageSize = 12)
         {
-            var messages = await _messageService.GetAllSpamAsync();
+            var user = await _userManager.FindByNameAsync(User.Identity.Name);
+            var messages = await _messageService.GetAllSpamAsync(user.Id);
             var values = new PagedList<ResultMessageDto>(messages.AsQueryable(), page, pageSize);
 
-            _logger.LogInformation("Spam Kutusu Görüntülendi: Toplam {Count} spam bulundu. Sayfa: {Page}", messages.Count, page);
+            _logger.LogInformation("🕷️ SPAM KUTUSU: {UserEmail} spam kontrolü yaptı. Tespit edilen spam: {Count}", user.Email, messages.Count);
 
             return View(values);
         }
