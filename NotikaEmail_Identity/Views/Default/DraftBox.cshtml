@@ -194,7 +194,7 @@
                             <tbody>
                                 @foreach (var message in Model)
                                 {
-                                    <tr onclick="window.location.href='/Default/ReceiverViewEmail/@message.Id';" class="@(message.IsRead ? "read" : "unread")">
+                                    <tr onclick="window.location.href='/Default/SendMessage?messageId=@message.Id'" class="unread">
 
                                         <td style="width: 50px; vertical-align: middle; padding: 15px 10px;">
                                             <label style="margin: 0; cursor: pointer;"><input type="checkbox" class="i-checks"></label>

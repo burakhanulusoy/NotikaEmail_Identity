@@ -71,6 +71,13 @@ namespace NotikaEmail_Identity.Services.MessageServices
 
         }
 
+        public async Task<UpdateMessageDto> GetByIdMessageForDraftAsync(int id)
+        {
+            var message = await _messageRepository.GetByIdMessageForDraftAsync(id);
+            return _mapper.Map<UpdateMessageDto>(message);
+
+        }
+
         public async Task<ResultMessageDto> GetByIdWithReceiverAsync(int id)
         {
 

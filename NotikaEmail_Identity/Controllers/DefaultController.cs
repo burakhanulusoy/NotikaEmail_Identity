@@ -118,14 +118,31 @@ namespace NotikaEmail_Identity.Controllers
 
 
         
-        public async Task<IActionResult> SendMessage(string? email)
+        public async Task<IActionResult> SendMessage(string? email,int? messageId)
         {
            await  GetCategories();
 
             var model = new SendMessageViewModel();
 
-         
-            if (!string.IsNullOrEmpty(email))
+            if (messageId.HasValue)
+            {
+                var draftMessage = await _messageService.GetByIdMessageForDraftAsync(messageId.Value);
+
+                if (draftMessage != null)
+                {
+                    // EĞER ALICI VARSA ata, YOKSA boş geç (Hata almamak için kontrol)
+                    if (draftMessage.Receiver != null)
+                    {
+                        model.ReceiverEmail = draftMessage.Receiver.Email;
+                    }
+
+                    model.Subject = draftMessage.Subject;
+                    model.MessageDetail = draftMessage.MessageDetail;
+                    model.MessageCategoryId = draftMessage.CategoryId;
+                }
+            }
+            // EĞER ID YOKSA AMA EMAIL VARSA (Yeni mesaj butonu veya kişi listesinden tıklama)
+            else if (!string.IsNullOrEmpty(email))
             {
                 model.ReceiverEmail = email;
             }
@@ -203,7 +220,8 @@ namespace NotikaEmail_Identity.Controllers
                 CategoryId = dto.MessageCategoryId,
                 IsRead = false,
                 AttachedFilePath = attachedFilePath,
-                IsDeleted=false
+                IsDeleted=false,
+                IsDraft=false
             };
 
 
@@ -211,6 +229,7 @@ namespace NotikaEmail_Identity.Controllers
             // BAŞARILI MESAJ GÖNDERİM LOGU (Ek dosya var mı yok mu onu bile yazdırdık!)
             _logger.LogInformation("Sistem İşlemi: {SenderEmail} adlı kullanıcı, {ReceiverEmail} adresine mesaj gönderdi. Konu: '{Subject}' | Ek Dosya: {HasAttachment}",
                 sender.Email, receiver.Email, dto.Subject, attachedFilePath != null ? "Var" : "Yok");
+
 
             return RedirectToAction("SendBox");
 

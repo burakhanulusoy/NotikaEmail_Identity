@@ -41,5 +41,7 @@ namespace NotikaEmail_Identity.Repositories.MessageRepositories
         Task<List<Message>> GetAllDrafAsync();
 
 
+        Task<Message> GetByIdMessageForDraftAsync(int id);
+
     }
 }

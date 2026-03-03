@@ -71,6 +71,12 @@ namespace NotikaEmail_Identity.Repositories.MessageRepositories
 
         }
 
+        public async Task<Message> GetByIdMessageForDraftAsync(int id)
+        {
+            return await _table.Include(x => x.Receiver).FirstOrDefaultAsync(x => x.Id == id);
+
+        }
+
         public async Task<Message> GetByIdWithReceiverAsync(int id)
         {
 
@@ -89,7 +95,7 @@ namespace NotikaEmail_Identity.Repositories.MessageRepositories
 
         public async Task<int> GetDontReadMessageCountAsync(int id)
         {
-             var count= await _table.Where(x=>x.ReceiverId == id && x.IsRead == false &&x.IsDeleted==false).CountAsync();
+             var count= await _table.Where(x=>x.ReceiverId == id && x.IsRead == false &&x.IsDeleted==false &&x.IsDraft==false).CountAsync();
             
              return count;
 

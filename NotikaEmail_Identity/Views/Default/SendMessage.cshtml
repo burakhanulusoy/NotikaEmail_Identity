@@ -106,26 +106,56 @@
         border: 1px solid #e8eaed;
     }
 
-    /* Gönder Butonu */
-    .btn-send {
-        background: #667eea;
-        border: none;
-        color: white;
-        padding: 12px 30px;
-        border-radius: 25px;
+    /* BUTON GRUBU TASARIMI */
+
+    /* Ortak Buton Özellikleri */
+    .btn-action {
+        border-radius: 50px; /* Tam oval (Pill) görünüm */
+        padding: 12px 35px;
         font-weight: 600;
-        font-size: 15px;
-        transition: 0.3s;
-        display: flex;
+        font-size: 14px;
+        letter-spacing: 0.5px;
+        border: none;
+        display: inline-flex;
         align-items: center;
-        gap: 8px;
+        gap: 10px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
     }
 
-        .btn-send:hover {
-            background: #5a6cd6;
+    /* Vazgeç Butonu (Sakin ve Modern) */
+    .btn-cancel-modern {
+        background-color: #f8f9fa;
+        color: #7f8c8d;
+        border: 1px solid #e0e4e8;
+    }
+
+        .btn-cancel-modern:hover {
+            background-color: #fff5f5;
+            color: #e74c3c; /* Üzerine gelince kırmızılaşır */
+            border-color: #ffcccc;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.15);
+        }
+
+    /* Gönder Butonu (Canlı ve Dikkat Çekici) */
+    .btn-send-modern {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Mor-Mavi Geçiş */
+        color: white;
+        box-shadow: 0 4px 15px rgba(118, 75, 162, 0.3);
+    }
+
+        .btn-send-modern:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); /* Rengi ters çevir */
             color: white;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            transform: translateY(-2px); /* Hafif yukarı kalkma efekti */
+            box-shadow: 0 8px 25px rgba(118, 75, 162, 0.5); /* Gölgeyi büyüt */
+        }
+
+        .btn-send-modern i, .btn-cancel-modern i {
+            font-size: 16px; /* İkon boyutunu ayarla */
         }
 </style>
 
@@ -185,7 +215,7 @@
 
                                 <div class="d-flex align-items-center">
                                     <label for="file-upload" class="attachment-btn" title="Dosya Ekle">
-                                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
                                         </svg>
                                     </label>
@@ -196,14 +226,16 @@
                                     </span>
                                 </div>
 
-                                <div class="d-flex" style="gap: 10px;">
-                                    <button type="button" id="btnCancel" class="btn btn-danger waves-effect" style="border-radius: 25px; padding: 12px 30px; font-weight: 600;">
+                                <div class="d-flex" style="gap: 15px;">
+
+                                    <button type="button" id="btnCancel" class="btn-action btn-cancel-modern">
                                         <i class="notika-icon notika-close"></i> Vazgeç
                                     </button>
 
-                                    <button type="submit" class="btn btn-send waves-effect">
+                                    <button id="messageForm" type="submit" class="btn-action btn-send-modern">
                                         Mesajı Gönder <i class="notika-icon notika-right-arrow"></i>
                                     </button>
+
                                 </div>
 
                             </div>
@@ -218,7 +250,6 @@
         </div>
     </div>
 </div>
-
 <script>
     function showFileName(input) {
         const displayBadge = document.getElementById('file-name-display');
@@ -226,35 +257,69 @@
 
         if (input.files && input.files.length > 0) {
             textSpan.textContent = input.files[0].name;
-            displayBadge.style.display = 'inline-flex'; // Dosya seçilince balonu göster
+            displayBadge.style.display = 'inline-flex';
         } else {
-            displayBadge.style.display = 'none'; // İptal edilirse gizle
+            displayBadge.style.display = 'none';
         }
     }
 </script>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
     $(document).ready(function () {
 
+        // ---------------------------------------------------------
+        // 1. SENARYO: "GÖNDER" BUTONUNA BASILINCA (Zorunlu Alan Kontrolü)
+        // ---------------------------------------------------------
+        $('#messageForm').on('submit', function (e) {
+
+            // Değerleri alıyoruz
+            var receiver = $('[name="ReceiverEmail"]').val().trim();
+            var subject = $('[name="Subject"]').val().trim();
+            var category = $('[name="MessageCategoryId"]').val();
+            var message = $('[name="MessageDetail"]').val().trim();
+
+            // KONTROL: Eğer bunlardan biri boşsa
+            // Not: category bazen null döner, bazen boş string "" döner, ikisini de kontrol edelim.
+            if (receiver === "" || subject === "" || category === null || category === "") {
+
+                e.preventDefault(); // Dur! Gönderme.
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Eksik Bilgi!',
+                    text: 'Lütfen Alıcı E-posta, Kategori ve Konu alanlarını mutlaka doldurunuz.',
+                    confirmButtonColor: '#d33',
+                    confirmButtonText: 'Tamam'
+                });
+            }
+            // Else durumuna gerek yok, hata yoksa form kendiliğinden gider.
+        });
+
+
+        // ---------------------------------------------------------
+        // 2. SENARYO: "VAZGEÇ" BUTONUNA BASILINCA (Taslak Kaydetme)
+        // ---------------------------------------------------------
         $('#btnCancel').on('click', function (e) {
             e.preventDefault();
 
-            var receiver = $('#ReceiverEmail').val();
-            var subject = $('#Subject').val();
-            var content = $('#MessageDetail').val();
+            var receiver = $('[name="ReceiverEmail"]').val();
+            var subject = $('[name="Subject"]').val();
+            var content = $('[name="MessageDetail"]').val();
 
+            // Eğer herhangi bir alan doluysa sor
             if (receiver !== "" || subject !== "" || content !== "") {
                 Swal.fire({
                     title: 'Sayfadan ayrılıyorsunuz!',
                     text: "Yazdıklarınızı taslak olarak kaydetmek ister misiniz?",
-                    icon: 'warning',
+                    icon: 'question',
                     showCancelButton: true,
                     confirmButtonColor: '#00c292',
                     cancelButtonColor: '#d33',
                     confirmButtonText: 'Evet, Taslaklara Kaydet',
-                    cancelButtonText: 'İptal, Sayfada Kal' // <-- METNİ GÜNCELLEDİK
+                    cancelButtonText: 'İptal, Sayfada Kal'
                 }).then((result) => {
                     if (result.isConfirmed) {
 
@@ -280,24 +345,15 @@
                             }
                         });
                     }
-                    // DİKKAT: Buradaki "else" bloğunu tamamen SİLDİK.
-                    // Artık İptal dendiğinde hiçbir şey olmayacak, ekranda kalacak!
                 });
             } else {
-                // Eğer form BOŞSA ve vazgeçe basarsa, onu sormadan Gelen Kutusuna atsın mı?
-                // Yoksa burada da mı hiçbir şey yapmasın? Şimdilik Gelen Kutusuna atsın diye bıraktım.
-                // Eğer boşken de basınca hiçbir şey yapmasın diyorsan aşağıdaki satırı silebilirsin.
+                // Form boşsa direkt çık
                 window.location.href = '/Default/Inbox';
             }
         });
 
     });
 </script>
-
-
-
-
-
 
 
 

@@ -55,7 +55,7 @@ namespace NotikaEmail_Identity.Controllers
 
             SmtpClient client = new SmtpClient();
             client.Connect("smtp.gmail.com", 587, false);
-            client.Authenticate("burakhanulusoy18@gmail.com", "vgmsjisxwqiyyflm");
+            client.Authenticate("burakhanulusoy18@gmail.com", "xhbicuiuxaffpwmz");
             client.Send(mimeMessage);
             client.Disconnect(true);
 

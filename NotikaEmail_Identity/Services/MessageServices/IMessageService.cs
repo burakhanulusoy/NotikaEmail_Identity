@@ -35,5 +35,10 @@ namespace NotikaEmail_Identity.Services.MessageServices
 
         Task<List<ResultMessageDto>> GetAllDrafAsync();
 
+
+        Task<UpdateMessageDto> GetByIdMessageForDraftAsync(int id);
+
+
+
     }
 }
