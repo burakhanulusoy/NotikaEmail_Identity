@@ -49,6 +49,13 @@ namespace NotikaEmail_Identity.Services.MessageServices
 
         }
 
+        public async Task<List<ResultMessageDto>> GetAllFiterWithReceiverAsync(Expression<Func<Message, bool>> filter)
+        {
+
+            var messages = await _messageRepository.GetAllFiterWithReceiverAsync(filter);
+            return _mapper.Map<List<ResultMessageDto>>(messages);
+        }
+
         public async Task<List<ResultMessageDto>> GetAllFiterWithSenderAsync(Expression<Func<Message, bool>> filter)
         {
             var messages = await _messageRepository.GetAllFiterWithSenderAsync(filter);
@@ -61,6 +68,12 @@ namespace NotikaEmail_Identity.Services.MessageServices
             var messages = await _messageRepository.GetAllGarbageBoxAsync(id);
             return _mapper.Map<List<ResultMessageDto>>(messages);
 
+        }
+
+        public async Task<List<ResultMessageDto>> GetAllSpamAsync()
+        {
+            var messages=await _messageRepository.GetAllSpamAsync();
+            return _mapper.Map<List<ResultMessageDto>>(messages);
         }
 
         public async Task<UpdateMessageDto> GetByIdAsync(int id)

@@ -40,9 +40,23 @@ namespace NotikaEmail_Identity.Repositories.MessageRepositories
                                 .Include(x => x.Receiver)
                                 .Where(x=>x.IsDraft==true)
                                 .Where(x => x.IsDeleted == false)
+                                .Where(x => x.IsSpam == false)
                                 .OrderByDescending(x => x.Id)
                                 .ToListAsync();
 
+        }
+
+        public async Task<List<Message>> GetAllFiterWithReceiverAsync(Expression<Func<Message, bool>> filter)
+        {
+            return await _table.Include(x => x.Category)
+                              .Include(x => x.Sender)
+                              .Include(x => x.Receiver)
+                              .Where(filter)
+                              .Where(x => x.IsDeleted == false)
+                              .Where(x => x.IsDraft == false)
+                              .Where(x => x.IsSpam == false)
+                              .OrderByDescending(x => x.Id)
+                              .ToListAsync();
         }
 
         public async Task<List<Message>> GetAllFiterWithSenderAsync(Expression<Func<Message, bool>> filter)
@@ -67,8 +81,21 @@ namespace NotikaEmail_Identity.Repositories.MessageRepositories
                 .Include(x=>x.Category)
                 .Where(x=>x.IsDeleted==true)
                 .Where(x=>x.IsDraft==false)
+                .Where(x=>x.IsSpam==false)
                 .AsNoTracking().ToListAsync();
 
+        }
+
+        public async Task<List<Message>> GetAllSpamAsync()
+        {
+            return await _table.Include(x => x.Category)
+                                 .Include(x => x.Sender)
+                                 .Include(x => x.Receiver)
+                                 .Where(x => x.IsDraft == false)
+                                 .Where(x => x.IsDeleted == false)
+                                 .Where(x => x.IsSpam == true)
+                                 .OrderByDescending(x => x.Id)
+                                 .ToListAsync();
         }
 
         public async Task<Message> GetByIdMessageForDraftAsync(int id)
@@ -95,7 +122,7 @@ namespace NotikaEmail_Identity.Repositories.MessageRepositories
 
         public async Task<int> GetDontReadMessageCountAsync(int id)
         {
-             var count= await _table.Where(x=>x.ReceiverId == id && x.IsRead == false &&x.IsDeleted==false &&x.IsDraft==false).CountAsync();
+             var count= await _table.Where(x=>x.ReceiverId == id && x.IsRead == false &&x.IsDeleted==false &&x.IsDraft==false &&x.IsSpam==false).CountAsync();
             
              return count;
 
@@ -118,7 +145,7 @@ namespace NotikaEmail_Identity.Repositories.MessageRepositories
         {
             
 
-            var messages = await _table.Where(x=>x.CategoryId==id).Where(x=>x.ReceiverId==userId).Include(x=>x.Sender).Include(x=>x.Receiver).
+            var messages = await _table.Where(x=>x.CategoryId==id).Where(x=>x.IsSpam==false).Where(x=>x.ReceiverId==userId).Include(x=>x.Sender).Include(x=>x.Receiver).
                 Include(x=>x.Category).Where(x=>x.IsDeleted==false).ToListAsync();
 
 

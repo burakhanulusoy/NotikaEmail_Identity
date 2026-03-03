@@ -12,6 +12,7 @@ namespace NotikaEmail_Identity.Repositories.MessageRepositories
         Task<List<Message>> GetAllByCategoryAndAppUserAsync();
 
         Task<List<Message>> GetAllFiterWithSenderAsync(Expression<Func<Message, bool>> filter);
+        Task<List<Message>> GetAllFiterWithReceiverAsync(Expression<Func<Message, bool>> filter);
 
         Task<Message> GetByIdWithReceiverAsync(int id);
         Task<Message> GetByIdWithSenderAsync(int id);
@@ -42,6 +43,13 @@ namespace NotikaEmail_Identity.Repositories.MessageRepositories
 
 
         Task<Message> GetByIdMessageForDraftAsync(int id);
+
+
+
+        Task<List<Message>> GetAllSpamAsync();
+
+
+
 
     }
 }

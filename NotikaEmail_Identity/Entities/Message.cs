@@ -28,7 +28,7 @@ namespace NotikaEmail_Identity.Entities
 
         public bool IsDraft { get; set; }
 
-
+        public bool IsSpam { get; set; }
 
     }
 }

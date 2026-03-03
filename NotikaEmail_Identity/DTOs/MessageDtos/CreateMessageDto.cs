@@ -25,6 +25,7 @@ namespace NotikaEmail_Identity.DTOs.MessageDtos
 
         public bool IsDeleted { get; set; }
         public bool IsDraft { get; set; }
+        public bool IsSpam { get; set; }
 
 
     }

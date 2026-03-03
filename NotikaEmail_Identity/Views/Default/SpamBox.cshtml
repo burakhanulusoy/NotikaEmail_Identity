@@ -1,10 +1,11 @@
 ﻿@using PagedList.Core.Mvc
 @model PagedList<ResultMessageDto>
 @{
-    ViewData["Title"] = "DraftBox";
+    ViewData["Title"] = "SpamBox";
     Layout = "~/Views/WebUI/Index.cshtml";
 
-       // Pager Ayarları
+
+    // Pager Ayarları
     var customOption = PagedListRenderOptions.Bootstrap4PageNumbersPlusPrevAndNext;
     customOption.LinkToPreviousPageFormat = "Önceki";
     customOption.LinkToNextPageFormat = "Sonraki";
@@ -23,6 +24,7 @@
         return "cat-default"; // Diğer her şey için Gri/Siyah
     }
 }
+
 
 <style>
     /* Tabloyu Sabitliyoruz */
@@ -244,7 +246,7 @@
                             </div>
 
                             <div class="pagination-links">
-                                <pager asp-action="DraftBox" asp-controller="Default" list="@Model" options="@customOption"></pager>
+                                <pager asp-action="SpamBox" asp-controller="Default" list="@Model" options="@customOption"></pager>
                             </div>
                         </div>
 

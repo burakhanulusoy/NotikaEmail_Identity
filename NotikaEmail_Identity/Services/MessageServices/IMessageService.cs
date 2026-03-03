@@ -10,6 +10,7 @@ namespace NotikaEmail_Identity.Services.MessageServices
     {
         Task<List<ResultMessageDto>> GetAllByCategoryAndAppUserAsync();
         Task<List<ResultMessageDto>> GetAllFiterWithSenderAsync(Expression<Func<Message, bool>> filter);
+        Task<List<ResultMessageDto>> GetAllFiterWithReceiverAsync(Expression<Func<Message, bool>> filter);
 
         Task<ResultMessageDto> GetByIdWithReceiverAsync(int id);
         Task<UpdateMessageDto> GetByIdWithSenderAsync(int id);
@@ -38,7 +39,7 @@ namespace NotikaEmail_Identity.Services.MessageServices
 
         Task<UpdateMessageDto> GetByIdMessageForDraftAsync(int id);
 
-
+        Task<List<ResultMessageDto>> GetAllSpamAsync();
 
     }
 }
