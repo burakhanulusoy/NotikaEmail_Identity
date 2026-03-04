@@ -2,6 +2,7 @@ using Core_IyzicoPaymentSystem.Models;
 using Core_IyzicoPaymentSystem.Repositories.OrderRepositories;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -94,30 +95,39 @@ builder.Services.AddAuthentication()
     });
 
 
-//builder.Services.AddAuthentication(options =>
-//{
-//    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-//    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 
 
-//}).AddJwtBearer(opt =>
-//{
-//    var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettingsModel>();
+}).AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+{
+    options.LoginPath = "Login/SignIn";
+    options.AccessDeniedPath = "/NotComponent/Index";//403
 
-//    opt.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-//    {
 
-//        ValidateIssuer = true,//kim üretti
-//        ValidateAudience = true,//kim kullanabilir
-//        ValidateLifetime = true,//token siresi doldumu
-//        ValidateIssuerSigningKey = true,//biz mi ürettik tokeni
-//        ValidIssuer = jwtSettings.Issuer,
-//        ValidAudience = jwtSettings.Audience,
-//        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key))//gizli anhtar token dogrulamýýýcn
+})
+    
+    
+    .AddJwtBearer(opt =>
+{
+    var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettingsModel>();
 
-//    };
+    opt.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    {
 
-//});
+        ValidateIssuer = true,//kim üretti
+        ValidateAudience = true,//kim kullanabilir
+        ValidateLifetime = true,//token siresi doldumu
+        ValidateIssuerSigningKey = true,//biz mi ürettik tokeni
+        ValidIssuer = jwtSettings.Issuer,
+        ValidAudience = jwtSettings.Audience,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key))//gizli anhtar token dogrulamýýýcn
+
+    };
+
+});
 
 
 

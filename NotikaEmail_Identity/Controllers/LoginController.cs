@@ -2,11 +2,15 @@
 using Microsoft.AspNetCore.Mvc;
 using NotikaEmail_Identity.Entities;
 using NotikaEmail_Identity.Models;
+using NotikaEmail_Identity.RoleNames;
 using System.Security.Claims;
 
 namespace NotikaEmail_Identity.Controllers
 {
-    public class LoginController(SignInManager<AppUser> _signInManager, UserManager<AppUser> _userManager, ILogger<LoginController> _logger) : Controller
+    public class LoginController(SignInManager<AppUser> _signInManager,
+        UserManager<AppUser> _userManager, 
+        ILogger<LoginController> _logger
+        ) : Controller
     {
         public IActionResult SignIn()
         {
@@ -54,8 +58,30 @@ namespace NotikaEmail_Identity.Controllers
                     return View(model);
                 }
 
-                _logger.LogInformation("✅ BAŞARILI GİRİŞ: {UserEmail} sisteme giriş yaptı. IP: {Ip}", user.Email, ipAddress);
-                return RedirectToAction("Inbox", "Default");
+
+                var roles=await  _userManager.GetRolesAsync(user);
+             
+                if (roles.Contains(Roles.Admin))
+                {
+
+
+                    _logger.LogInformation("✅ BAŞARILI GİRİŞ ADMİN: {UserEmail} sisteme giriş yaptı. IP: {Ip}", user.Email, ipAddress);
+                    return RedirectToAction("Index", "Dashboard",new {area="Admin"});
+
+                }
+
+                if (roles.Contains(Roles.User))
+                {
+                    _logger.LogInformation("✅ BAŞARILI GİRİŞ USER: {UserEmail} sisteme giriş yaptı. IP: {Ip}", user.Email, ipAddress);
+                    return RedirectToAction("Inbox", "Default");
+
+                }
+
+
+                return RedirectToAction("SigIn", "Login");
+
+
+
             }
 
             if (result.IsLockedOut)
@@ -72,6 +98,26 @@ namespace NotikaEmail_Identity.Controllers
                 return View(model);
             }
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
         // ==========================================

@@ -30,7 +30,7 @@ namespace NotikaEmail_Identity.Services.SendEmailServices
 
             client.Connect("smtp.gmail.com", 587, false);
 
-            client.Authenticate("burakhanulusoy18@gmail.com", "xhbicuiuxaffpwmz");
+            client.Authenticate("burakhanulusoy18@gmail.com", "jdargwuprysuesew");
 
             client.Send(mimeMessage);
 

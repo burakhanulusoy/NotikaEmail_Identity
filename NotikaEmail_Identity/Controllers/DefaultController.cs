@@ -8,6 +8,9 @@ using NotikaEmail_Identity.Models;
 using NotikaEmail_Identity.Services.CategoryServices;
 using NotikaEmail_Identity.Services.MessageServices;
 using PagedList.Core;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace NotikaEmail_Identity.Controllers
@@ -18,7 +21,9 @@ namespace NotikaEmail_Identity.Controllers
                                    ICategoryService _categoryService,
                                    IWebHostEnvironment _hostEnvironment,
                                    ILogger<DefaultController> _logger,
-                                   SignInManager<AppUser> signInManager) : Controller
+                                   SignInManager<AppUser> signInManager,
+                                   IConfiguration _configuration
+                                   ) : Controller
     {
 
         public async Task<IActionResult> Inbox(int page = 1, int pageSize = 12)
@@ -112,6 +117,7 @@ namespace NotikaEmail_Identity.Controllers
                                   }).ToList();
         }
 
+      
         public async Task<IActionResult> SendMessage(string? email, int? messageId)
         {
             await GetCategories();
@@ -143,8 +149,6 @@ namespace NotikaEmail_Identity.Controllers
 
             return View(model);
         }
-
-
         [HttpPost]
         public async Task<IActionResult> SendMessage(SendMessageViewModel dto)
         {
@@ -159,6 +163,13 @@ namespace NotikaEmail_Identity.Controllers
                 ModelState.AddModelError("", "Bu maile sahip bir kullanıcı bulunamadı");
                 return View(dto);
             }
+
+
+
+
+
+
+
 
             string? attachedFilePath = null;
             long fileSize = 0;
@@ -398,5 +409,16 @@ namespace NotikaEmail_Identity.Controllers
 
             return View(values);
         }
+
+
+       
+
+
+
+
+
+
+
+
     }
 }
