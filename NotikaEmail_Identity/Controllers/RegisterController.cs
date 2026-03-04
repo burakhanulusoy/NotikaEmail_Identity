@@ -43,7 +43,9 @@ namespace NotikaEmail_Identity.Controllers
                 Job = "Belirtilmemiş",
                 AboutMe = "Belirtilmemiş",
                 ActivationCode = activationCode,
-                EmailConfirmed = false // Açıkça belirtmekte fayda var
+                EmailConfirmed = false, // Açıkça belirtmekte fayda var
+                IsActive= false
+                
             };
 
             // 2. Kullanıcı Oluşturma (Identity)

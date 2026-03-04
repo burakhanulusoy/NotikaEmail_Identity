@@ -103,7 +103,7 @@ builder.Services.AddAuthentication(options =>
 
 }).AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
 {
-    options.LoginPath = "Login/SignIn";
+    options.LoginPath = "/Login/SignIn";
     options.AccessDeniedPath = "/NotComponent/Index";//403
 
 

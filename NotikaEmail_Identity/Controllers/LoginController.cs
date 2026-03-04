@@ -58,6 +58,14 @@ namespace NotikaEmail_Identity.Controllers
                     return View(model);
                 }
 
+                if (user.IsActive is true)
+                {
+                    _logger.LogWarning("⏳ ONAYSIZ GİRİŞ: {Email} Pasif edilmiş hesap. Giriş engellendi.", user.Email);
+                    await _signInManager.SignOutAsync(); // İçeri almadan atıyoruz
+                    ModelState.AddModelError("", "Kayıtlı hesabınız kapatılmıştır lütfen kontrol edin.");
+                    return View(model);
+                }
+
 
                 var roles=await  _userManager.GetRolesAsync(user);
              

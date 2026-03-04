@@ -22,7 +22,7 @@ namespace NotikaEmail_Identity.Entities
         public IList<Message> SentMessages { get; set; }
         public IList<Message> ReceivedMessages { get; set; }
 
-
+        public bool IsActive { get; set; }
 
     }
 }
