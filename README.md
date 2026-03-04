@@ -340,9 +340,51 @@ Yapay zeka modülleri, ana akışı bozmayacak şekilde servis olarak enjekte ed
 
 
 
+## ⚙️ Kurulum
 
+Projeyi yerel ortamınızda sorunsuz çalıştırmak için aşağıdaki adımları izleyin:
 
+1.  **Projeyi Klonlayın**
+    ```bash
+    git clone [https://github.com/BURAYA-REPO-ADRESINIZI-YAZIN.git](https://github.com/BURAYA-REPO-ADRESINIZI-YAZIN.git)
+    cd proje-adi
+    ```
 
+2.  **Gerekli Ayarlamalar (appsettings.json)**
+    Projenin düzgün çalışması için `appsettings.json` dosyasındaki şu alanları kendi bilgilerinizle güncelleyin:
+    * **Connection Strings:** Veritabanı bağlantı cümleniz.
+    * **Mail Ayarları:** SMTP bilgileri (Şifremi unuttum vb. işlemler için).
+    * **Iyzico:** API ve Secret Key bilgileri.
+    * **Auth:** Google ve Facebook Login için Client ID ve Secret bilgileri.
+    * **Seq:** Loglama için (`http://localhost:5341` varsayılan).
+
+3.  **Veritabanı Migrations**
+    Terminal veya Package Manager Console üzerinden veritabanını oluşturun:
+    ```bash
+    dotnet ef database update
+    ```
+
+4.  **Projeyi Başlatın**
+    ```bash
+    dotnet run
+    ```
+
+<div align="center">
+
+## 🎥 Proje Videosu ve İletişim
+
+Projenin çalışır halini görmek, kurulum videosunu izlemek veya bana soru sormak için LinkedIn profilime göz atabilirsiniz.
+
+<a href="https://www.linkedin.com/in/burakhanulusoy/" target="_blank">
+  <img src="https://img.shields.io/badge/LinkedIn-Burakhan%20Ulusoy-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn Hesabım" />
+</a>
+
+<br>
+<br>
+
+📫 **Bana Ulaşın:** [linkedin.com/in/burakhanulusoy](https://www.linkedin.com/in/burakhanulusoy/)
+
+</div>
 
 
 
