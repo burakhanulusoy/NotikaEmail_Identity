@@ -1,7 +1,7 @@
 <div align="center">
 
 # 🚀 Notika
-### Yapay Zeka Destekli, Abonelik Bazlı SaaS İletişim Platformu
+### Yapay Zeka Destekli, Abonelik Bazlı  Mail Gönderme Platformu
 
 ![ASP.NET Core 9.0](https://img.shields.io/badge/ASP.NET_Core_9.0-5C2D91?style=for-the-badge&logo=dotnet)
 ![Payment](https://img.shields.io/badge/FinTech-Iyzico_Payment-0065FF?style=for-the-badge&logo=contactlesspayment)
@@ -15,7 +15,7 @@
   <strong>Güvenli Ödeme, Derinlemesine Analiz ve Akıllı İletişim.</strong>
 </p>
 <p align="center">
-  <i>Iyzico ile entegre ödeme geçidi, Seq ile yapılandırılmış kullanıcı takibi, Google/Facebook OAuth mimarisi<br>ve ML.NET tabanlı güvenlik kalkanı ile donatılmış uçtan uca ticari SaaS projesi.</i>
+  <i>Iyzico ile entegre ödeme geçidi, Seq ile yapılandırılmış kullanıcı takibi, Google/Facebook OAuth mimarisi<br>ve ML.NET tabanlı güvenlik kalkanı ile donatılmış .Net Core MVC projesi.</i>
 </p>
 
 </div>
@@ -24,26 +24,26 @@
 
 **Notika**, modern yazılım dünyasının en kritik üç bileşenini (FinTech, Observability, Security) tek bir potada eriten vizyoner bir platformdur. Kullanıcıların **Iyzico** güvencesiyle premium paket satın alabildiği, tüm sistemsel hareketlerin **Seq** sunucusunda adım adım izlendiği ve giriş işlemlerinin **OAuth 2.0** (Google/Facebook) ile saniyeler içinde tamamlandığı bütüncül bir yönetim ekosistemidir.
 
-Bu proje, sadece teknik bir çözüm değil; **abonelik ekonomisine (Subscription Economy)** uygun, ölçeklenebilir ve canlıya alınmaya hazır bir iş modelidir.
+Bu proje, sadece teknik bir çözüm değil; **abonelik ekonomisine (Subscription Economy)** uygun, ölçeklenebilir ve canlıya alınmaya hazır bir platform modelidir.
 
 ---
 
-## 🌟 Projenin 3 Ana Güç Sütunu
+## 🌟 Projenin 7 Ana Güç Sütunu
 
-Notika, sıradan bir mesajlaşma uygulamasından, ticari bir ürüne şu üç temel özellikle dönüşür:
+Notika, sıradan bir mesajlaşma uygulamasından, ticari bir ürüne şu yedi temel özellikle dönüşür:
 
 ### 💳 1. Iyzico ile Uçtan Uca Ödeme (FinTech)
 Proje, gerçek dünya e-ticaret standartlarına uygun bir ödeme altyapısına sahiptir.
-* **Paket Mimarisi:** Sistemde "Basic", "Gold" ve "Platinum" olmak üzere dinamik paketler bulunur.
+* **Paket Mimarisi:** Sistemde "Basic" ,"Platinum" olmak üzere dinamik paketler bulunur.
 * **Güvenli Ödeme Ağı:** Kullanıcı kart bilgilerini girdiğinde, veri veritabanına kaydedilmeden doğrudan **Iyzico API**'ye şifreli olarak iletilir.
 * **3D Secure & Taksit:** Iyzico'nun sunduğu güvenli ödeme formları ve taksit seçenekleri backend tarafında yönetilir.
-* **Anlık Rol Yükseltme:** Ödeme "Success" döndüğü milisaniye içerisinde, arka planda çalışan servisler kullanıcının **Role** yetkisini `StandardUser`'dan `PremiumUser`'a yükseltir.
+* **Anlık Rol Yükseltme:** Ödeme "Success" döndüğü milisaniye içerisinde, arka planda çalışan servisler kullanıcının  yetkisini `StandardUser`'dan `PremiumUser`'a yükseltir.
 
 ### 📊 2. Seq ile Merkezi Loglama ve Kullanıcı Yolculuğu (Observability)
 Klasik metin dosyası loglamasının ötesinde, **Structured Logging (Yapılandırılmış Loglama)** mimarisi kullanılmıştır.
 * **Canlı İzleme:** Sistemdeki her hata, uyarı veya bilgi mesajı anlık olarak Seq sunucusuna (Dashboard) düşer.
 * **User Journey (Kullanıcı Yolculuğu):** Bir hata oluştuğunda, sadece hatayı değil; o kullanıcının sisteme girdiği andan hatayı aldığı ana kadar hangi sayfalara tıkladığı, ödeme adımında ne kadar beklediği gibi tüm akış `CorrelationId` ile takip edilebilir.
-* **Sorgulanabilir Loglar:** Adminler, "Son 1 saatte ödeme hatası alan kullanıcılar kim?" gibi soruları SQL benzeri sorgularla Seq üzerinden cevaplayabilir.
+* **Sorgulanabilir Loglar:** Adminler, "Son 1 saatte ödeme hatası alan kullanıcılar kim?" gibi soruları S Seq üzerinden bulabiir.
 
 ### 🔐 3. Google & Facebook ile OAuth 2.0 Entegrasyonu
 Kullanıcı deneyimini (UX) maksimize eden modern kimlik doğrulama süreçleri.
@@ -91,7 +91,7 @@ Proje, spagetti kod yapısından uzak, **SOLID** prensiplerine sıkı sıkıya b
 | **Validasyon** | **FluentValidation (Server-Side Rules)** |
 | **Asenkron Yapı** | **Tamamen `async/await` tabanlı Non-Blocking I/O** |
 | **Bağımlılık Yönetimi** | **Dependency Injection (Built-in IoC Container)** |
-| **Ödeme Altyapısı** | **Iyzico API Entegrasyonu (SaaS Modeli)** |
+| **Ödeme Altyapısı** | **Iyzico API Entegrasyonu** |
 | **Gözlemlenebilirlik** | **Serilog & Seq (Structured Logging)** |
 | **Yapay Zeka** | **ML.NET (On-Premise) & Anthropic Claude (Cloud API)** |
 
