@@ -74,7 +74,7 @@ namespace NotikaEmail_Identity.Controllers
 
 
                     _logger.LogInformation("✅ BAŞARILI GİRİŞ ADMİN: {UserEmail} sisteme giriş yaptı. IP: {Ip}", user.Email, ipAddress);
-                    return RedirectToAction("Index", "Dashboard",new {area="Admin"});
+                    return RedirectToAction("Index", "User",new {area="Admin"});
 
                 }
 

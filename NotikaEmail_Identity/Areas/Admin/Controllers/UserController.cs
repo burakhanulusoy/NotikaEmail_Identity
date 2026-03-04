@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,9 @@ using System.Threading.Tasks;
 
 namespace NotikaEmail_Identity.Areas.Admin.Controllers
 {
+
+    [Authorize(Roles = "Admin")]
+
     [Area(Roles.Admin)]
     public class UserController(RoleManager<AppRole> _roleManager,UserManager<AppUser> _userManager,IUserService _userService,IMapper _mapper) : Controller
     {

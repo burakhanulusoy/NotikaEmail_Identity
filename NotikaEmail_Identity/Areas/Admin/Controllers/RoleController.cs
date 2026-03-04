@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 
 namespace NotikaEmail_Identity.Areas.Admin.Controllers
 {
+    [Authorize(Roles = "Admin")]
+
     [Area(Roles.Admin)]
     public class RoleController(RoleManager<AppRole> _roleManager,UserManager<AppUser> _useerManager) : Controller
     {
